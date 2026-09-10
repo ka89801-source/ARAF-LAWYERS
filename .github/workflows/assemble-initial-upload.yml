@@ -14,30 +14,36 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Reconstruct source files and build HTML
+      - name: Restore original source archive and build HTML
         run: |
           python - <<'PY'
           from pathlib import Path
-          import base64
+          import base64, zipfile, shutil
 
-          source = Path('araf-lawyers-src')
-          source.mkdir(exist_ok=True)
-          parts = Path('.upload_parts')
+          parts = Path('.upload_parts/source-zip')
+          encoded = ''.join(p.read_text().strip() for p in sorted(parts.glob('part-*')))
+          archive = Path('/tmp/araf-lawyers-src.zip')
+          archive.write_bytes(base64.b64decode(encoded))
 
-          for name in ['app.js', 'core.js', 'data.js', 'styles.css', 'views-biz.js', 'views-cases.js', 'views-work.js']:
-              folder = parts / name
-              encoded = ''.join(p.read_text().strip() for p in sorted(folder.glob('part-*')))
-              (source / name).write_bytes(base64.b64decode(encoded))
+          unpack = Path('/tmp/araf-unpack')
+          with zipfile.ZipFile(archive) as z:
+              z.extractall(unpack)
 
-          html = (source / 'index.src.html').read_text()
-          css = (source / 'styles.css').read_text()
-          js = '\n'.join((source / f).read_text() for f in ['data.js','core.js','app.js','views-cases.js','views-work.js','views-biz.js'])
+          extracted = unpack / 'araf-lawyers-src'
+          target = Path('araf-lawyers-src')
+          if target.exists():
+              shutil.rmtree(target)
+          shutil.copytree(extracted, target)
+
+          html = (target / 'index.src.html').read_text()
+          css = (target / 'styles.css').read_text()
+          js = '\n'.join((target / f).read_text() for f in ['data.js','core.js','app.js','views-cases.js','views-work.js','views-biz.js'])
           out = html.replace('/*CSS*/', css).replace('/*JS*/', js)
           Path('index.html').write_text(out)
           Path('araf-lawyers.html').write_text(out)
           PY
 
-      - name: Commit reconstructed project
+      - name: Commit complete project and remove transport parts
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
