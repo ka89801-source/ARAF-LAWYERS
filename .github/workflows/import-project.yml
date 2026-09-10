@@ -17,7 +17,8 @@ jobs:
       - name: Reconstruct source package and build
         shell: bash
         run: |
-          cat .upload_tmp/s* | base64 -d > /tmp/araf-lawyers-src.zip
+          cat .upload_tmp/s* | base64 --decode --ignore-garbage > /tmp/araf-lawyers-src.zip
+          unzip -tq /tmp/araf-lawyers-src.zip
           rm -rf /tmp/araf-src
           mkdir -p /tmp/araf-src
           unzip -q /tmp/araf-lawyers-src.zip -d /tmp/araf-src
