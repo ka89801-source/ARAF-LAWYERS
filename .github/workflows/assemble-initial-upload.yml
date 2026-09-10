@@ -1,0 +1,47 @@
+name: Assemble initial upload
+
+on:
+  push:
+    paths:
+      - '.upload_ready'
+
+permissions:
+  contents: write
+
+jobs:
+  assemble:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Reconstruct source files and build HTML
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import base64
+
+          source = Path('araf-lawyers-src')
+          source.mkdir(exist_ok=True)
+          parts = Path('.upload_parts')
+
+          for name in ['app.js', 'core.js', 'data.js', 'styles.css', 'views-biz.js', 'views-cases.js', 'views-work.js']:
+              folder = parts / name
+              encoded = ''.join(p.read_text().strip() for p in sorted(folder.glob('part-*')))
+              (source / name).write_bytes(base64.b64decode(encoded))
+
+          html = (source / 'index.src.html').read_text()
+          css = (source / 'styles.css').read_text()
+          js = '\n'.join((source / f).read_text() for f in ['data.js','core.js','app.js','views-cases.js','views-work.js','views-biz.js'])
+          out = html.replace('/*CSS*/', css).replace('/*JS*/', js)
+          Path('index.html').write_text(out)
+          Path('araf-lawyers.html').write_text(out)
+          PY
+
+      - name: Commit reconstructed project
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm -r .upload_parts .upload_ready
+          git add araf-lawyers-src index.html araf-lawyers.html
+          git commit -m "Import complete ARAF Lawyers project"
+          git push
