@@ -14,10 +14,84 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Reconstruct source package and build
+      - name: Verify package, reconstruct source and build
         shell: bash
         run: |
-          cat .upload_tmp/s* | base64 --decode --ignore-garbage > /tmp/araf-lawyers-src.zip
+          python - <<'PY'
+          from pathlib import Path
+          import base64, hashlib
+
+          targets = [
+              ('s00', 14000, '0c5552252729e126006d11ee547c68024eb309eb'),
+              ('s01', 14000, 'dee9c9244b86af9b879ccff733da74b9df7041a1'),
+              ('s02a', 7000, '565113bacf08013cedaf1368e86cddc3241039d8'),
+              ('s02b', 7000, '6a837b2ea217b2015162956b7216afe06f61f660'),
+              ('s03', 14000, '06fc4d8ac28661ca008558c854528bd1e71ea7a2'),
+              ('s04', 14000, '1f8edf91381b577bc0383965523b546ffb3b1307'),
+              ('s05', 14000, '1f3d63254690dbb58d0ce387a146897991715d2b'),
+              ('s06', 14000, '39fee72a615de6f2d677f63168323d6396622bb5'),
+              ('s07', 14000, '83ed1813da3624d9e5fdf84941471852e11c71e7'),
+              ('s08a', 7000, '310f4094bfa7cfec3e18b2726db79eefaf86572a'),
+              ('s08b', 7000, 'dc729920b9d90884828288dbec9688ca239cd836'),
+              ('s09', 3048, 'f9049533613efcbb24ebdec1460d7efcb15a55f2'),
+          ]
+          alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
+
+          def blob_sha(s):
+              b = s.encode('ascii')
+              return hashlib.sha1(f'blob {len(b)}\0'.encode() + b).hexdigest()
+
+          def repair(name, text, expected_len, expected_sha):
+              text = ''.join(text.split())
+              if len(text) == expected_len and blob_sha(text) == expected_sha:
+                  return text
+              found = None
+              if len(text) == expected_len + 1:
+                  for i in range(len(text)):
+                      candidate = text[:i] + text[i+1:]
+                      if blob_sha(candidate) == expected_sha:
+                          found = candidate
+                          break
+              elif len(text) == expected_len - 1:
+                  for i in range(len(text) + 1):
+                      for ch in alphabet:
+                          candidate = text[:i] + ch + text[i:]
+                          if blob_sha(candidate) == expected_sha:
+                              found = candidate
+                              break
+                      if found:
+                          break
+              elif len(text) == expected_len:
+                  for i, old in enumerate(text):
+                      for ch in alphabet:
+                          if ch == old:
+                              continue
+                          candidate = text[:i] + ch + text[i+1:]
+                          if blob_sha(candidate) == expected_sha:
+                              found = candidate
+                              break
+                      if found:
+                          break
+              if found is None:
+                  raise SystemExit(f'Integrity check failed for {name}: len={len(text)} sha={blob_sha(text)}')
+              return found
+
+          canonical = []
+          for name, expected_len, expected_sha in targets:
+              p = Path('.upload_tmp') / name
+              data = repair(name, p.read_text(), expected_len, expected_sha)
+              p.write_text(data)
+              canonical.append(data)
+
+          encoded = ''.join(canonical)
+          payload = base64.b64decode(encoded, validate=True)
+          digest = hashlib.sha256(payload).hexdigest()
+          expected = '221cd08e95953ec2ddd77dcae57755431e15715b365952628f97b55afdea407f'
+          if digest != expected:
+              raise SystemExit(f'ZIP SHA256 mismatch: {digest}')
+          Path('/tmp/araf-lawyers-src.zip').write_bytes(payload)
+          print('Source ZIP integrity verified:', digest)
+          PY
           unzip -tq /tmp/araf-lawyers-src.zip
           rm -rf /tmp/araf-src
           mkdir -p /tmp/araf-src
@@ -26,13 +100,19 @@ jobs:
           cp /tmp/araf-lawyers-src.zip ./araf-lawyers-src.zip
           python - <<'PY'
           from pathlib import Path
+          import hashlib
           p = Path('.')
           html = (p/'index.src.html').read_text()
           css = (p/'styles.css').read_text()
           js = '\n'.join((p/f).read_text() for f in ['data.js','core.js','app.js','views-cases.js','views-work.js','views-biz.js'])
           out = html.replace('/*CSS*/', css).replace('/*JS*/', js)
+          digest = hashlib.sha256(out.encode()).hexdigest()
+          expected = '7884c8cff012c51f35ef3013732618be3b80b7bfdb615172d7d741b8a5b9b096'
+          if digest != expected:
+              raise SystemExit(f'Built HTML SHA256 mismatch: {digest}')
           (p/'index.html').write_text(out)
           (p/'araf-lawyers.html').write_text(out)
+          print('Built HTML integrity verified:', digest)
           PY
           rm -rf .upload_tmp
       - name: Commit imported files
