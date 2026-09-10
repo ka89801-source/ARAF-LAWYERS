@@ -24,14 +24,20 @@ jobs:
           targets = [
               ('s00', 14000, '0c5552252729e126006d11ee547c68024eb309eb'),
               ('s01', 14000, 'dee9c9244b86af9b879ccff733da74b9df7041a1'),
-              ('s02a', 7000, '565113bacf08013cedaf1368e86cddc3241039d8'),
+              ('s02a0', 1750, '041d494054d7bc4107ed56381faf6394c850ac8f'),
+              ('s02a1', 1750, '0f2abac364d0c18e61c159d710d0d5ade9f79357'),
+              ('s02a2', 1750, '0b7124b5ca12a21728b5a5e7a3c57af42ea0732c'),
+              ('s02a3', 1750, '149f8cae7b365ab1f619d1a7f5a7e58b5382233b'),
               ('s02b', 7000, '6a837b2ea217b2015162956b7216afe06f61f660'),
               ('s03', 14000, '06fc4d8ac28661ca008558c854528bd1e71ea7a2'),
               ('s04', 14000, '1f8edf91381b577bc0383965523b546ffb3b1307'),
               ('s05', 14000, '1f3d63254690dbb58d0ce387a146897991715d2b'),
               ('s06', 14000, '39fee72a615de6f2d677f63168323d6396622bb5'),
               ('s07', 14000, '83ed1813da3624d9e5fdf84941471852e11c71e7'),
-              ('s08a', 7000, '310f4094bfa7cfec3e18b2726db79eefaf86572a'),
+              ('s08a0', 1750, '52a418f6379e718d288a1a422192f4f7ae688971'),
+              ('s08a1', 1750, '708162662ae079e4e3b399f903715935cfa2b761'),
+              ('s08a2', 1750, '69a578b9e8c0172b7ad343eb2485bc3352bee9fe'),
+              ('s08a3', 1750, 'de651949540359ec11894b66744a0b416e6d47f6'),
               ('s08b', 7000, 'dc729920b9d90884828288dbec9688ca239cd836'),
               ('s09', 3048, 'f9049533613efcbb24ebdec1460d7efcb15a55f2'),
           ]
@@ -74,13 +80,13 @@ jobs:
                           break
               if found is None:
                   raise SystemExit(f'Integrity check failed for {name}: len={len(text)} sha={blob_sha(text)}')
+              print(f'Repaired transport difference in {name}')
               return found
 
           canonical = []
           for name, expected_len, expected_sha in targets:
               p = Path('.upload_tmp') / name
               data = repair(name, p.read_text(), expected_len, expected_sha)
-              p.write_text(data)
               canonical.append(data)
 
           encoded = ''.join(canonical)
