@@ -987,6 +987,108 @@ select.inp{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important;scroll-behavior:auto !important}
 }
+
+/* ---------- Clear portals and universal search ---------- */
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.side .nav-group{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;padding-bottom:8px}
+.side .brand,.side .side-foot{flex-shrink:0}
+.nav-portal .nav-i{width:100%;text-align:start}
+.nav-portal-toggle .portal-chevron{width:14px;height:14px;margin-inline-start:auto;transition:transform .25s var(--ease-out)}
+.nav-portal-toggle.active-portal{color:var(--navy);font-weight:600}
+.nav-portal-toggle.active-portal>svg:first-child{color:var(--gold-dk);opacity:1}
+.nav-portal.is-open .portal-chevron{transform:rotate(180deg)}
+.nav-children{display:grid;grid-template-rows:0fr;visibility:hidden;transition:grid-template-rows .25s var(--ease-out),visibility .25s}
+.nav-children>div{min-height:0;overflow:hidden}
+.nav-portal.is-open .nav-children{grid-template-rows:1fr;visibility:visible}
+.nav-children .nav-child{height:34px;font-size:12.5px;padding-inline-start:22px;gap:9px}
+.nav-child svg{width:16px;height:16px}
+.nav-child .cnt{font-size:10px;min-width:18px;height:18px}
+.app.collapsed .nav-children,.app.collapsed .portal-chevron{display:none}
+.portal-shortcuts{margin-bottom:26px}
+.portal-shortcuts .sec-h{margin-bottom:10px}
+.portal-launchers{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.portal-launcher{display:flex;align-items:center;gap:10px;text-align:start;padding:14px 12px;border-radius:var(--r);background:var(--sunk);box-shadow:inset 0 0 0 1px var(--line);transition:background .2s,box-shadow .2s,transform .22s var(--ease-out)}
+.portal-launcher:hover{background:var(--gold-bg);box-shadow:inset 0 0 0 1px var(--gold-soft),var(--sh-2);transform:translateY(-2px)}
+.portal-launcher:active{transform:translateY(0) scale(.99)}
+.portal-icon{display:grid;place-items:center;width:38px;height:38px;flex-shrink:0;border-radius:11px;background:var(--sheet);color:var(--navy);box-shadow:var(--sh-1);transition:color .2s,transform .25s var(--spring)}
+.portal-icon svg{width:20px;height:20px}
+.portal-launcher:hover .portal-icon{color:var(--gold-dk);transform:translateY(-2px)}
+.portal-launcher b,.portal-link b{display:block;font-size:13.5px;font-weight:600}
+.portal-launcher small,.portal-link small{display:block;font-size:11.5px;color:var(--mute);line-height:1.65;margin-top:2px}
+.portal-arrow{width:14px;height:14px;flex-shrink:0;color:var(--faint)}
+.portal-launcher .portal-arrow{width:12px}
+.portal-search{display:flex;align-items:center;gap:14px;width:100%;text-align:start;padding:18px 20px;border-radius:var(--r-lg);background:var(--sunk);box-shadow:inset 0 0 0 1px var(--line-2);margin-bottom:20px;transition:background .2s,box-shadow .2s}
+.portal-search:hover{background:var(--gold-bg);box-shadow:inset 0 0 0 1px var(--gold-soft)}
+.portal-search>svg{width:22px;height:22px;color:var(--gold-dk)}
+.portal-search b{display:block;font-size:16px;font-weight:600;color:var(--navy)}
+.portal-search small{display:block;font-size:12.5px;color:var(--mute);margin-top:3px}
+.portal-search .kbd{flex-shrink:0}
+.portal-filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+.portal-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;align-items:start}
+.portal-grid.single{grid-template-columns:1fr}
+.portal-panel{min-width:0;border-radius:var(--r-lg);box-shadow:inset 0 0 0 1px var(--line-2);overflow:hidden;animation:viewIn .35s var(--ease-out) var(--portal-delay,0ms) both}
+.portal-panel-head{display:flex;align-items:center;gap:12px;padding:20px;background:var(--sunk)}
+.portal-panel-head h2{font-size:17px;font-weight:600;color:var(--navy)}
+.portal-panel-head p{font-size:12.5px;color:var(--mute);margin-top:2px}
+.portal-links{display:grid;gap:4px;padding:10px}
+.portal-grid.single .portal-links{grid-template-columns:repeat(2,minmax(0,1fr))}
+.portal-link{display:flex;align-items:center;gap:12px;text-align:start;padding:12px;border-radius:10px;min-width:0;transition:background .2s,transform .2s var(--ease-out)}
+.portal-link>svg:first-child{width:18px;height:18px;color:var(--navy)}
+.portal-link:hover{background:var(--gold-bg);transform:translateX(-2px)}
+.portal-link small{overflow-wrap:anywhere}
+.portal-quick{display:flex;align-items:center;flex-wrap:wrap;gap:7px;padding:12px 18px;border-top:1px solid var(--line)}
+.portal-quick>span{font-size:11.5px;color:var(--mute);margin-inline-end:4px}
+.portal-help{display:flex;flex-wrap:wrap;gap:6px;margin-top:22px}
+.searchbtn{min-width:0;flex-shrink:0}
+.searchbtn>span:not(.kbd){white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:start}
+.searchbtn .kbd{flex-shrink:0}
+.destination-focus{outline:2px solid var(--gold);outline-offset:3px;border-radius:var(--r);animation:viewIn .32s var(--ease-out)}
+.cmd-wrap{padding:clamp(12px,10vh,80px) 12px 16px}
+.cmd{display:flex;flex-direction:column;max-height:calc(100vh - 100px);max-height:calc(100dvh - 100px)}
+.cmd-in,.cmd-scopes,.cmd-context,.cmd-foot{flex-shrink:0}
+.cmd-in input{min-width:0;width:100%}
+.cmd-close{width:32px;height:32px;flex-shrink:0}
+.cmd-scopes{display:flex;gap:6px;padding:9px 14px;border-bottom:1px solid var(--line)}
+.cmd-scopes button{padding:5px 14px;border-radius:8px;color:var(--mute);font-size:12.5px;font-weight:500;transition:background .2s,color .2s}
+.cmd-scopes button:hover{background:var(--sunk)}
+.cmd-scopes button.on{background:var(--navy);color:#fff}
+.cmd-context{display:flex;align-items:center;gap:8px;justify-content:space-between;padding:8px 16px;background:var(--gold-bg);font-size:12.5px;color:var(--ink-2)}
+.cmd-res{min-height:0;max-height:none;overflow-y:auto;overscroll-behavior:contain}
+.cmd-i .t,.cmd-i .m{overflow-wrap:anywhere}
+.cmd-i .go,.cmd-i>.kbd{flex-shrink:0}
+.cmd-foot{justify-content:space-between;gap:12px}
+.cmd-foot .cmd-key-help{gap:8px}
+.cmd-foot .kbd{margin:0}
+@media (max-width:1280px){
+  .app:not(.expanded) .nav-children,.app:not(.expanded) .portal-chevron{display:none}
+}
+@media (max-width:1100px){
+  .portal-launchers{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:760px){
+  .portal-launcher{align-items:flex-start;padding:12px;gap:8px}
+  .portal-launcher .portal-icon{width:30px;height:30px;border-radius:9px}
+  .portal-launcher .portal-icon svg{width:17px;height:17px}
+  .portal-launcher .portal-arrow{display:none}
+  .portal-launcher b{font-size:12.5px}
+  .portal-launcher small{font-size:11px}
+  .portal-grid,.portal-grid.single .portal-links{grid-template-columns:1fr}
+  .portal-panel-head{padding:16px}
+  .portal-search{padding:16px;gap:10px}
+  .portal-search b{font-size:14px}
+  .portal-search .kbd{display:none}
+  .portal-filters{gap:6px}
+  .portal-filters .chip{font-size:12px;padding:0 9px}
+  .searchbtn{flex-shrink:1}
+  .cmd-wrap{padding:12px}
+  .cmd{max-height:calc(100vh - 24px);max-height:calc(100dvh - 24px)}
+  .cmd-in{padding:0 12px;gap:8px}
+  .cmd-i{gap:9px;padding:10px 9px}
+  .cmd-i .go{display:none}
+  .cmd-foot{padding:10px 12px;font-size:11px}
+  .cmd-scopes{padding:8px 10px;gap:4px}
+  .cmd-scopes button{padding:5px 12px}
+}
 </style>
 </head>
 <body>
@@ -1642,7 +1744,7 @@ const NAV = [
   '-',
   { r: 'services', l: 'خدمات أعراف', ic: 'sparkle', cls: 'services' },
 ];
-const TITLES = { home: 'اليوم', cases: 'القضايا', calendar: 'الجلسات', tasks: 'المهام', clients: 'العملاء', docs: 'المستندات', team: 'الفريق', finance: 'المالية', analytics: 'التحليلات', services: 'خدمات أعراف' };
+const TITLES = { portals: 'بوابات المكتب', home: 'اليوم', cases: 'القضايا', calendar: 'الجلسات', tasks: 'المهام', clients: 'العملاء', docs: 'المستندات', team: 'الفريق', finance: 'المالية', analytics: 'التحليلات', services: 'خدمات أعراف' };
 
 function shell() {
   const unread = NOTIFS.filter((n) => n.unread).length;
@@ -1650,7 +1752,7 @@ function shell() {
   <div class="app" id="app">
     <aside class="side">
       <div class="brand"><div class="brand-mark">${LOGO}</div><div class="brand-txt"><b>أعراف</b><small>للمحامين</small></div></div>
-      <nav class="nav-group" id="nav"></nav>
+      <nav class="nav-group" id="nav" aria-label="التنقل الرئيسي"></nav>
       <div class="side-foot">
         <button class="nav-i" data-a="notifs">${ic('bell')}<span>الإشعارات</span><span class="cnt hot" id="navNotif">${unread}</span></button>
         <button class="nav-i" data-a="settings">${ic('sliders')}<span>الإعدادات</span></button>
@@ -1659,9 +1761,9 @@ function shell() {
     </aside>
     <main class="main"><div class="sheet">
       <header class="topbar">
-        <button class="icon-btn" data-a="toggleSide" data-tip="طي القائمة">${ic('menu')}</button>
+        <button class="icon-btn" data-a="toggleSide" data-tip="القائمة والبوابات" aria-label="فتح القائمة والبوابات">${ic('menu')}</button>
         <div class="crumbs" id="crumbs"></div>
-        <button class="searchbtn" data-a="cmd">${ic('search')}<span>ابحث عن قضية أو عميل، أو نفّذ أمرًا</span><span class="kbd">Ctrl K</span></button>
+        <button class="searchbtn" data-a="cmd" aria-haspopup="dialog" aria-controls="cmd" aria-label="ابحث عن أي خيار أو خدمة">${ic('search')}<span>ابحث عن أي خيار أو خدمة…</span><span class="kbd">Ctrl K</span></button>
         <div class="today-chip"><b>${wd(TODAY)}، ${dm(TODAY)}</b><span>${hijri(TODAY)}</span></div>
         <button class="icon-btn" data-a="notifs" data-tip="الإشعارات">${ic('bell')}<span class="dot" id="bellDot">${unread}</span></button>
       </header>
@@ -1680,22 +1782,27 @@ function shell() {
   paintNav();
 }
 function paintNav() {
-  $('#nav').innerHTML = NAV.map((n) => {
-    if (n === '-') return '<div class="nav-sep"></div>';
-    const c = n.cnt ? n.cnt() : ''; const on = S.route === n.r || (n.r === 'cases' && S.route === 'case');
-    const cnt = c ? (typeof c === 'object' ? `<span class="cnt hot">${c.n}</span>` : `<span class="cnt">${c}</span>`) : '';
-    return `<button class="nav-i ${n.cls || ''} ${on ? 'on' : ''}" data-a="nav" data-to="${n.r}">${ic(n.ic)}<span>${n.l}</span>${cnt}</button>`;
-  }).join('');
-  const mob = [['home', 'اليوم', 'home'], ['calendar', 'الجلسات', 'cal'], ['tasks', 'المهام', 'tasks'], ['cases', 'القضايا', 'cases'], ['more', 'المزيد', 'menu']];
+  $('#nav').innerHTML = portalNav();
+  syncNavGroups();
+  const mob = [['home', 'اليوم', 'home'], ['calendar', 'الجلسات', 'cal'], ['tasks', 'المهام', 'tasks'], ['cases', 'القضايا', 'cases'], ['portals', 'البوابات', 'grid']];
   const late = TASKS.filter((t) => t.who === 'u1' && isLate(t)).length;
-  $('#mnav').innerHTML = mob.map(([r, l, i]) => `<button class="${S.route === r || (r === 'cases' && S.route === 'case') ? 'on' : ''}" data-a="${r === 'more' ? 'mobMore' : 'nav'}" data-to="${r}">${ic(i)}${l}${r === 'tasks' && late ? `<span class="cnt">${late}</span>` : ''}</button>`).join('');
+  $('#mnav').innerHTML = mob.map(([r, l, i]) => `<button class="${S.route === r || (r === 'cases' && S.route === 'case') ? 'on' : ''}" data-a="nav" data-to="${r}">${ic(i)}${l}${r === 'tasks' && late ? `<span class="cnt">${late}</span>` : ''}</button>`).join('');
   const un = NOTIFS.filter((n) => n.unread).length;
   $('#bellDot').textContent = un; $('#bellDot').style.display = un ? '' : 'none'; $('#navNotif').textContent = un; $('#navNotif').style.display = un ? '' : 'none';
 }
 function crumbs() {
+  const group = portalForRoute();
   let h = '';
-  if (S.route === 'case') { const c = CS(S.id); h = `<button data-a="nav" data-to="cases">القضايا</button>${ic('chevL')}<b>${c.title}</b>`; }
-  else h = `<b>${TITLES[S.route]}</b>`;
+  if (S.route === 'case') {
+    const c = CS(S.id);
+    h = '<button data-a="nav" data-to="portals" data-id="practice">القضايا والعملاء</button>' + ic('chevL') +
+      '<button data-a="nav" data-to="cases">القضايا</button>' + ic('chevL') + '<b>' + esc(c.title) + '</b>';
+  } else if (S.route === 'portals' && S.portalId) {
+    h = '<button data-a="nav" data-to="portals">كل البوابات</button>' + ic('chevL') + '<b>' + PORTALS.find((g) => g.id === S.portalId).l + '</b>';
+  } else if (group) {
+    h = '<button data-a="nav" data-to="portals" data-id="' + group.id + '">' + group.l + '</button>' + ic('chevL') +
+      '<b>' + (S.route === 'services' && S.serviceSection ? (SERVICES[S.serviceSection]?.l || 'تتبع طلباتي') : TITLES[S.route]) + '</b>';
+  } else h = '<b>' + TITLES[S.route] + '</b>';
   $('#crumbs').innerHTML = h;
 }
 
@@ -1705,12 +1812,13 @@ function parseHash() {
   const p = location.hash.replace(/^#\/?/, '').split('/');
   const r = p[0] || 'home';
   if (r === 'case' && CS(p[1])) { S.route = 'case'; S.id = p[1]; S.tab = p[2] || 'overview'; }
-  else if (VIEWS[r]) { S.route = r; }
+  else if (Object.prototype.hasOwnProperty.call(VIEWS, r)) { S.route = r; }
   else S.route = 'home';
+  parseNavigationHash(p);
 }
 function go(route, id, tab) {
   const h = '#/' + route + (id ? '/' + id : '') + (tab ? '/' + tab : '');
-  if (location.hash === h) render(true); else location.hash = h;
+  if (location.hash === h) { parseHash(); render(true); } else location.hash = h;
 }
 function render(anim = true) {
   closePop(); $('#peek')?.remove(); tipEl?.classList.remove('show');
@@ -1722,9 +1830,9 @@ function render(anim = true) {
     if (anim) { v.classList.remove('enter'); void v.offsetWidth; v.classList.add('enter'); }
     after(v);
   };
+  if (anim) $('#scroll').scrollTop = 0;
   if (first) { v.innerHTML = skeleton(); v.classList.remove('enter'); setTimeout(paint, 260); } else paint();
   paintNav(); crumbs();
-  if (anim) $('#scroll').scrollTop = 0;
 }
 function rerender() { const sc = $('#scroll').scrollTop; $('#view').innerHTML = VIEWS[S.route](); after($('#view')); $('#scroll').scrollTop = sc; paintNav(); }
 function after(root) { runCounters(root); runRings(root); syncIndicators(root); HOOKS.forEach((f) => f(root)); }
@@ -1760,16 +1868,16 @@ document.addEventListener('keydown', (e) => {
   if (e.shiftKey && e.key === 'T') { quickAdd('task'); }
 });
 
-A.nav = (el) => go(el.dataset.to);
+A.nav = (el) => { closeDrawer(); closeModal(); go(el.dataset.to, el.dataset.id, el.dataset.tab); };
 A.openCase = (el, e) => { e?.stopPropagation(); go('case', el.dataset.id, el.dataset.tab); closeDrawer(); closeModal(); };
 A.drClose = closeDrawer; A.drBack = drawerBack; A.mClose = closeModal;
-A.toggleSide = () => { const a = $('#app'); if (innerWidth <= 1280) a.classList.toggle('expanded'); else a.classList.toggle('collapsed'); setTimeout(() => syncIndicators(), 360); };
+A.toggleSide = () => { if (innerWidth <= 760) return go('portals'); const a = $('#app'); if (innerWidth <= 1280) { a.classList.remove('collapsed'); a.classList.toggle('expanded'); } else { a.classList.remove('expanded'); a.classList.toggle('collapsed'); } syncNavGroups(); setTimeout(() => syncIndicators(), 360); };
 A.seg = (el) => { S[el.dataset.k] = el.dataset.v; rerender(); };
 A.stop = (el, e) => e.stopPropagation();
 A.copy = (el, e) => { e.stopPropagation(); navigator.clipboard?.writeText(el.dataset.v); toast(`نُسخ الرقم ${'<span class="ltr num">' + el.dataset.v + '</span>'}`); };
 A.meMenu = (el) => openPop(el, [{ h: 'أ. خالد — الشريك المؤسس' }, { l: 'صفحتي', ic: 'user', f: () => openMember('u1') }, { l: 'تجربة البداية', ic: 'sparkle', f: onboarding }, { l: 'اختصارات لوحة المفاتيح', ic: 'keyboard', f: shortcuts }, '-', { l: 'تسجيل الخروج', ic: 'logout', red: true, f: () => toast('هذه نسخة تجريبية؛ تسجيل الخروج غير مفعّل', { info: true }) }], { alignStart: true });
 A.settings = () => toast('الإعدادات خارج نطاق هذه النسخة التجريبية', { info: true });
-A.mobMore = (el) => openPop(el, [['clients', 'العملاء', 'users'], ['docs', 'المستندات', 'file'], ['team', 'الفريق', 'team'], ['finance', 'المالية', 'wallet'], ['analytics', 'التحليلات', 'chart'], ['services', 'خدمات أعراف', 'sparkle']].map(([r, l, i]) => ({ l, ic: i, f: () => go(r) })).concat(['-', { l: 'الإشعارات', ic: 'bell', f: openNotifs }]));
+A.mobMore = () => go('portals');
 window.addEventListener('resize', () => syncIndicators());
 
 /* ==========================================================
@@ -1820,6 +1928,8 @@ VIEWS.home = () => {
       <div class="key">${ic('alert')}<span>أهم شيء اليوم: تنتهي مهلة الاعتراض في قضية شركة نماء ${rel(nearDl.at)}.</span></div>
     </div>
   </section>
+
+  ${portalShortcuts()}
 
   <section class="ribbon">
     <div class="rb-h"><div class="sec-t">يومك<small>من 8 صباحًا حتى 6 مساءً</small></div>
@@ -2749,7 +2859,7 @@ VIEWS.services = () => {
 
   <div class="feat"><div class="ic">${ic('trend', 'width="22" height="22"')}</div><div><div style="font-weight:600;font-size:15px">القضايا التجارية نمت لديك 22% خلال ربع واحد</div><div class="muted" style="font-size:13px">مكاتب مماثلة تحوّل هذا النمو إلى حضور مهني عبر خطة محتوى تجارية موجهة لأصحاب المنشآت. نبدأ بقراءة ما يبحث عنه عملاؤك الحاليون.</div></div><button class="btn btn-p" data-a="svcRequest" data-id="sv4">خطة محتوى تجاري</button></div>
 
-  <div class="cat-nav" id="svcCats">${Object.entries(SERVICES).map(([k, v]) => `<button class="${S.svcCat === k ? 'on' : ''}" data-a="seg" data-k="svcCat" data-v="${k}">${ic(v.ic)}${v.l}<span class="muted" style="font-size:11.5px;${S.svcCat === k ? 'color:rgba(255,255,255,.6)' : ''}">${v.items.length}</span></button>`).join('')}</div>
+  <div class="cat-nav" id="svcCats">${Object.entries(SERVICES).map(([k, v]) => `<button class="${S.svcCat === k ? 'on' : ''}" data-a="nav" data-to="services" data-id="${k}">${ic(v.ic)}${v.l}<span class="muted" style="font-size:11.5px;${S.svcCat === k ? 'color:rgba(255,255,255,.6)' : ''}">${v.items.length}</span></button>`).join('')}</div>
   ${S.svcCat === 'marketing' ? `<p class="muted" style="font-size:12.5px;margin:-10px 0 16px">${ic('lock', 'width="13" height="13" style="display:inline;vertical-align:-2px"')} نلتزم في كل خدمة تسويقية بالضوابط المهنية للإعلان عن خدمات المحاماة في المملكة.</p>` : ''}
   <div class="svc-grid">${cat.items.map((s, i) => `<article class="svc" style="animation:rbIn .5s var(--ease-out) ${i * 40}ms both">${s.tag ? `<span class="tag badge b-gold">${s.tag}</span>` : ''}<div class="ic">${ic(cat.ic)}</div><h3>${s.t}</h3><p>${s.p}</p><ul>${s.get.map((g) => `<li>${ic('check')}${g}</li>`).join('')}</ul>
     <div class="foot"><div class="price"><small>يبدأ من</small><b>${sar(s.price)}</b>${s.unit ? ` <small style="display:inline">${s.unit}</small>` : ''}</div><span class="grow"></span><span class="muted" style="font-size:12px">${ic('clock', 'width="13" height="13" style="display:inline;vertical-align:-2px"')} ${s.dur}</span><button class="btn btn-sm btn-p" data-a="svcRequest" data-id="${s.id}">اطلب</button></div></article>`).join('')}</div>
@@ -2816,52 +2926,185 @@ A.nAct = (el) => {
 };
 
 /* ==========================================================
-   COMMAND PALETTE
+   SEARCH — options, services and records in one command palette
    ========================================================== */
-const CMDS = [
-  ['إضافة مهمة', 'plus', () => quickAdd('task'), 'Shift T'], ['قضية جديدة', 'cases', () => quickAdd('case')], ['جلسة جديدة', 'cal', () => quickAdd('session')], ['عميل جديد', 'users', () => quickAdd('client')], ['فاتورة جديدة', 'receipt', () => quickAdd('invoice')], ['رفع مستند', 'upload', () => A.fakeUpload()],
-  ['موجز اليوم', 'sun', () => A.brief()], ['مراجعة الأسبوع', 'activity', () => A.weekly()], ['الإشعارات', 'bell', openNotifs],
-  ...NAV.filter((n) => n !== '-').map((n) => [`الانتقال إلى ${n.l}`, n.ic, () => go(n.r)]),
-  ['طلب خدمة من أعراف', 'sparkle', () => go('services')], ['اختصارات لوحة المفاتيح', 'keyboard', () => shortcuts()],
-];
-let cmdIdx = 0, cmdItems = [];
-function openCmd() {
-  const w = $('#cmd'); w.innerHTML = `<div class="cmd"><div class="cmd-in">${ic('search')}<input id="cmdQ" placeholder="ابحث في القضايا والعملاء والمهام والجلسات، أو اكتب أمرًا" autocomplete="off"><span class="kbd">Esc</span></div><div class="cmd-res" id="cmdRes"></div>
-    <div class="cmd-foot"><span><span class="kbd">↑↓</span>تنقل</span><span><span class="kbd">Enter</span>فتح</span><span><span class="kbd">Esc</span>إغلاق</span><span style="margin-inline-start:auto">جرّب: «العم» أو «456» أو «فاتورة»</span></div></div>`;
-  w.classList.add('show'); w.onclick = (e) => { if (e.target === w) closeCmd(); };
-  const q = $('#cmdQ'); q.focus(); q.oninput = () => cmdSearch(q.value);
-  q.onkeydown = (e) => { if (e.key === 'ArrowDown') { e.preventDefault(); cmdIdx = Math.min(cmdItems.length - 1, cmdIdx + 1); cmdPaint(); } if (e.key === 'ArrowUp') { e.preventDefault(); cmdIdx = Math.max(0, cmdIdx - 1); cmdPaint(); } if (e.key === 'Enter') { e.preventDefault(); cmdRun(cmdIdx); } };
+const CMD_SCOPES = [['all', 'الكل'], ['options', 'الخيارات'], ['services', 'الخدمات'], ['records', 'السجلات']];
+let cmdIdx = 0, cmdItems = [], cmdScope = 'all', cmdCaseTab = '', cmdReturnFocus = null;
+let cmdExpanded = new Set();
+function openCmd(options = {}) {
+  const w = $('#cmd');
+  if (w.classList.contains('show') && !options.caseTab && !options.scope) { $('#cmdQ')?.focus(); return; }
+  if (!w.classList.contains('show')) cmdReturnFocus = document.activeElement;
+  cmdScope = CMD_SCOPES.some(([key]) => key === options.scope) ? options.scope : 'all';
+  cmdCaseTab = CTABS.some(([key]) => key === options.caseTab) ? options.caseTab : '';
+  cmdExpanded = new Set();
+  const section = CTABS.find(([key]) => key === cmdCaseTab);
+  w.innerHTML = '<div class="cmd" role="dialog" aria-modal="true" aria-labelledby="cmdTitle">' +
+    '<h2 class="sr-only" id="cmdTitle">' + (section ? 'اختر قضية لفتح ' + section[1] : 'البحث في أعراف') + '</h2>' +
+    '<div class="cmd-in">' + ic('search') + '<input id="cmdQ" type="text" role="combobox" aria-label="' +
+    (section ? 'ابحث عن القضية' : 'ابحث عن أي خيار أو خدمة أو سجل') +
+    '" aria-autocomplete="list" aria-expanded="true" aria-controls="cmdRes" autocomplete="off" spellcheck="false" maxlength="160" placeholder="' +
+    (section ? 'ابحث باسم القضية أو رقمها…' : 'ما الذي تريد الوصول إليه؟') +
+    '"><button class="icon-btn cmd-close" data-a="cmdClose" aria-label="إغلاق البحث">' + ic('x') + '</button></div>' +
+    (section ? '<div class="cmd-context"><span>اختر قضية لفتح <b>' + section[1] +
+      '</b></span><button class="btn btn-sm btn-q" data-a="cmdReset">كل الخيارات</button></div>' :
+      '<div class="cmd-scopes" aria-label="نطاق البحث">' + CMD_SCOPES.map(([key, label]) =>
+        '<button data-a="cmdScope" data-scope="' + key + '" aria-pressed="' + (cmdScope === key) + '" class="' +
+        (cmdScope === key ? 'on' : '') + '">' + label + '</button>').join('') + '</div>') +
+    '<div class="cmd-res" id="cmdRes" role="listbox" aria-label="نتائج البحث"></div>' +
+    '<div class="cmd-foot"><span class="cmd-key-help"><span class="kbd">↑↓</span>تنقل <span class="kbd">Enter</span>فتح</span>' +
+    '<span id="cmdStatus" role="status" aria-live="polite"></span></div></div>';
+  w.inert = false;
+  w.classList.add('show');
+  w.onclick = (e) => { if (e.target === w) closeCmd(); };
+  const q = $('#cmdQ');
+  q.oninput = () => { cmdExpanded.clear(); cmdSearch(q.value); };
+  w.onkeydown = (e) => {
+    e.stopPropagation();
+    if (e.key === 'Escape') { e.preventDefault(); closeCmd(); return; }
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); q.focus(); return; }
+    if (e.key === 'Tab') {
+      const focusable = $$('input, button', w);
+      const first = focusable[0], last = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+      return;
+    }
+    if (e.target !== q || e.isComposing) return;
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      if (!cmdItems.length) return;
+      cmdIdx = (cmdIdx + (e.key === 'ArrowDown' ? 1 : -1) + cmdItems.length) % cmdItems.length;
+      cmdPaint();
+    }
+    if (e.key === 'Enter') { e.preventDefault(); cmdRun(cmdIdx); }
+  };
   cmdSearch('');
+  q.focus();
 }
-function closeCmd() { $('#cmd').classList.remove('show'); }
-A.cmd = openCmd;
-function hl(text, q) { if (!q) return esc(text); const nt = norm(text), nq = norm(q); const i = nt.indexOf(nq); if (i < 0) return esc(text); return esc(text.slice(0, i)) + '<mark>' + esc(text.slice(i, i + q.length)) + '</mark>' + esc(text.slice(i + q.length)); }
-function cmdSearch(q) {
-  const nq = norm(q.trim()); const m = (s) => !nq || norm(s).includes(nq);
-  const G = [];
-  if (!nq) {
-    G.push(['مقترحات الآن', [
-      { t: 'تقديم مذكرة التعقيب — الأفق', m: 'موعد نهائي اليوم 4:30 م', ic: 'clock', f: () => A.openTask({ dataset: { id: 't2' } }) },
-      { t: 'شركة نماء ضد مؤسسة الإعمار الحديث', m: 'مهلة الاعتراض تنتهي بعد يومين', ic: 'alert', f: () => go('case', 'c3') },
-      { t: 'جلسة المحكمة العمالية 11:30', m: 'محمد الغامدي ضد شركة البيان', ic: 'cal', f: () => openSession('s7') }]]);
-    G.push(['أوامر', CMDS.slice(0, 6).map(([t, i, f, k]) => ({ t, ic: i, f, k }))]);
-  } else {
-    const cs = CASES.filter((c) => m(c.title + ' ' + c.no + ' ' + c.opp + ' ' + c.type + ' ' + c.subj)).slice(0, 5).map((c) => ({ t: c.title, m: `${c.type} — ${c.no} — ${STATUS[c.status].l}`, ic: 'cases', f: () => go('case', c.id) }));
-    const kl = CLIENTS.filter((c) => m(c.name + ' ' + (c.contact || ''))).slice(0, 4).map((c) => ({ t: c.name, m: `${c.kind} — ${clientCases(c.id).length} قضايا`, ic: 'users', f: () => { S.clientId = c.id; go('clients'); } }));
-    const ts = TASKS.filter((t) => t.st !== 'done' && m(t.t)).slice(0, 4).map((t) => ({ t: t.t, m: `${U(t.who).short} — ${rel(t.due)}`, ic: 'tasks', f: () => A.openTask({ dataset: { id: t.id } }) }));
-    const ss = SESSIONS.filter((s) => s.at >= sod(TODAY) && m(CS(s.case).title + ' ' + CS(s.case).court + ' جلسة')).slice(0, 3).map((s) => ({ t: `جلسة ${dm(s.at)} — ${CS(s.case).title}`, m: CS(s.case).court, ic: 'cal', f: () => openSession(s.id) }));
-    const ds = DOCS.filter((d) => m(d.name + ' ' + d.type)).slice(0, 3).map((d) => ({ t: d.name, m: d.type + (d.case ? ' — ' + CS(d.case).title : ''), ic: 'file', f: () => A.openDoc({ dataset: { id: d.id } }) }));
-    const cm = CMDS.filter(([t]) => m(t)).slice(0, 4).map(([t, i, f, k]) => ({ t, ic: i, f, k }));
-    [['القضايا', cs], ['العملاء', kl], ['المهام', ts], ['الجلسات', ss], ['المستندات', ds], ['أوامر', cm]].forEach((g) => g[1].length && G.push(g));
+function closeCmd(restoreFocus = true) {
+  const w = $('#cmd');
+  w.classList.remove('show');
+  w.inert = true;
+  setTimeout(() => { if (!w.classList.contains('show')) w.innerHTML = ''; }, 180);
+  w.onclick = null;
+  w.onkeydown = null;
+  if (restoreFocus && cmdReturnFocus?.isConnected) cmdReturnFocus.focus({ preventScroll: true });
+  cmdReturnFocus = null;
+}
+A.cmd = () => openCmd();
+A.cmdClose = () => closeCmd();
+A.cmdReset = () => openCmd({ scope: 'all' });
+A.cmdScope = (el) => {
+  if (!CMD_SCOPES.some(([key]) => key === el.dataset.scope)) return;
+  cmdScope = el.dataset.scope;
+  cmdExpanded.clear();
+  $$('.cmd-scopes button').forEach((b) => {
+    b.classList.toggle('on', b.dataset.scope === cmdScope);
+    b.setAttribute('aria-pressed', String(b.dataset.scope === cmdScope));
+  });
+  cmdSearch($('#cmdQ').value);
+  $('#cmdQ').focus();
+};
+function hl(value, query) {
+  const text = String(value ?? '');
+  const words = searchText(query).split(' ').filter(Boolean);
+  if (!words.length) return esc(text);
+  let normalized = '', offset = 0;
+  const positions = [];
+  for (const char of text) {
+    const part = searchText(char) || (/\s/.test(char) ? ' ' : '');
+    normalized += part;
+    for (let unit = 0; unit < part.length; unit++) positions.push([offset, offset + char.length]);
+    offset += char.length;
   }
-  cmdItems = G.flatMap((g) => g[1]); cmdIdx = 0;
-  let i = 0; $('#cmdRes').innerHTML = cmdItems.length ? G.map(([l, items]) => `<div class="cmd-g">${l}</div>` + items.map((it) => `<div class="cmd-i" data-ci="${i++}"><div class="ic">${ic(it.ic)}</div><div class="grow" style="min-width:0"><div class="t ell">${hl(it.t, q.trim())}</div>${it.m ? `<div class="m ell">${it.m}</div>` : ''}</div>${it.k ? `<span class="kbd">${it.k}</span>` : `<span class="go">فتح ${ic('chevL', 'width="12" height="12"')}</span>`}</div>`).join('')).join('')
-    : `<div class="empty" style="padding:34px">${emptyArt()}<b>لا نتائج لـ «${esc(q)}»</b><p>جرّب رقم القضية أو جزءًا من اسم العميل. البحث يتجاهل الهمزات والتاء المربوطة.</p></div>`;
-  $$('#cmdRes .cmd-i').forEach((el) => { el.onmouseenter = () => { cmdIdx = +el.dataset.ci; cmdPaint(false); }; el.onclick = () => cmdRun(+el.dataset.ci); });
-  cmdPaint();
+  const ranges = [];
+  words.forEach((word) => {
+    let from = 0, at;
+    while ((at = normalized.indexOf(word, from)) !== -1) {
+      ranges.push([positions[at][0], positions[at + word.length - 1][1]]);
+      from = at + word.length;
+    }
+  });
+  ranges.sort((a, b) => a[0] - b[0]);
+  const merged = [];
+  ranges.forEach(([start, end]) => {
+    const last = merged[merged.length - 1];
+    if (last && start <= last[1]) last[1] = Math.max(last[1], end);
+    else merged.push([start, end]);
+  });
+  let html = '', cursor = 0;
+  merged.forEach(([start, end]) => { html += esc(text.slice(cursor, start)) + '<mark>' + esc(text.slice(start, end)) + '</mark>'; cursor = end; });
+  return html + esc(text.slice(cursor));
 }
-function cmdPaint(scroll = true) { $$('#cmdRes .cmd-i').forEach((el) => el.classList.toggle('act', +el.dataset.ci === cmdIdx)); if (scroll) $('#cmdRes .cmd-i.act')?.scrollIntoView({ block: 'nearest' }); }
-function cmdRun(i) { const it = cmdItems[i]; if (!it) return; closeCmd(); closeDrawer(); setTimeout(it.f, 60); }
+function cmdSearch(query) {
+  const q = query.trim();
+  let groups;
+  if (!searchText(q) && cmdScope === 'all' && !cmdCaseTab) {
+    const options = optionEntries();
+    groups = [
+      ['بوابات المكتب', options[0][1].filter((item) => item.id.startsWith('portal-'))],
+      ['إضافة سريعة', options[1][1].filter((item) => item.id.startsWith('quick-'))],
+      ['مقترحات الآن', [
+        { t: 'تقديم مذكرة التعقيب — الأفق', m: 'موعد نهائي اليوم 4:30 م', ic: 'clock', f: () => A.openTask({ dataset: { id: 't2' } }) },
+        { t: 'شركة نماء ضد مؤسسة الإعمار الحديث', m: 'مهلة الاعتراض تنتهي بعد يومين', ic: 'alert', f: () => go('case', 'c3') },
+        { t: 'جلسة المحكمة العمالية 11:30', m: 'محمد الغامدي ضد شركة البيان', ic: 'cal', f: () => openSession('s7') },
+      ]],
+    ];
+  } else groups = searchGroups(q, cmdScope, cmdCaseTab);
+  const total = groups.reduce((sum, group) => sum + group[1].length, 0);
+  const displayed = groups.map(([label, entries]) => {
+    const limit = !q && cmdScope === 'all' && !cmdCaseTab ? 7 : 6;
+    if (cmdExpanded.has(label) || entries.length <= limit) return [label, entries];
+    return [label, [...entries.slice(0, limit), {
+      t: 'عرض المزيد من ' + label + ' (' + (entries.length - limit) + ')',
+      m: 'إظهار بقية النتائج المطابقة', ic: 'chevD', stay: true,
+      f: () => { cmdExpanded.add(label); cmdSearch(q); },
+    }]];
+  });
+  cmdItems = displayed.flatMap((group) => group[1]);
+  cmdIdx = cmdItems.length ? 0 : -1;
+  let index = 0;
+  $('#cmdRes').innerHTML = cmdItems.length ? displayed.map(([label, entries]) =>
+    '<div role="group" aria-label="' + esc(label) + '"><div class="cmd-g" aria-hidden="true">' + label + '</div>' +
+    entries.map((item) => {
+      const current = index++;
+      return '<div class="cmd-i" id="cmd-result-' + current + '" role="option" aria-selected="false" data-ci="' + current + '">' +
+        '<div class="ic">' + ic(item.ic) + '</div><div class="grow"><div class="t">' + hl(item.t, q) + '</div>' +
+        (item.m ? '<div class="m">' + esc(item.m) + '</div>' : '') + '</div>' +
+        (item.k ? '<span class="kbd">' + esc(item.k) + '</span>' : '<span class="go">' + (item.stay ? 'المزيد' : 'فتح') + ic('chevL', 'width="12" height="12"') + '</span>') + '</div>';
+    }).join('') + '</div>').join('') :
+    '<div class="empty" style="padding:28px">' + emptyArt() + '<b>لا نتائج لـ «' + esc(q) + '»</b>' +
+    '<p>جرّب كلمة أقصر، مثل «سكرتير» أو «مصروف»، أو رقم القضية. ويمكنك توسيع البحث إلى الكل.</p></div>';
+  $('#cmdStatus').textContent = total ? total + ' نتيجة' : 'لا نتائج مطابقة';
+  $$('#cmdRes .cmd-i').forEach((el) => {
+    el.onmouseenter = () => { cmdIdx = +el.dataset.ci; cmdPaint(false); };
+    el.onmousedown = (e) => e.preventDefault();
+    el.onclick = () => cmdRun(+el.dataset.ci);
+  });
+  $('#cmdRes').scrollTop = 0;
+  cmdPaint(false);
+}
+function cmdPaint(scroll = true) {
+  $$('#cmdRes .cmd-i').forEach((el) => {
+    const selected = +el.dataset.ci === cmdIdx;
+    el.classList.toggle('act', selected);
+    el.setAttribute('aria-selected', String(selected));
+  });
+  const q = $('#cmdQ'), selected = $('#cmd-result-' + cmdIdx);
+  if (selected) q.setAttribute('aria-activedescendant', selected.id);
+  else q.removeAttribute('aria-activedescendant');
+  if (scroll) selected?.scrollIntoView({ block: 'nearest' });
+}
+function cmdRun(index) {
+  const item = cmdItems[index];
+  if (!item) return;
+  if (item.stay) { item.f(); return; }
+  closeCmd();
+  closeDrawer();
+  closeModal();
+  item.f();
+}
 
 /* ==========================================================
    QUICK ADD (FAB + forms)
@@ -2934,6 +3177,261 @@ A.obGo = (el) => { const v = el.dataset.v; ob.step = 0; closeModal(); if (v === 
 function shortcuts() {
   const K_ = [['Ctrl K أو /', 'البحث والأوامر'], ['N', 'إضافة سريعة'], ['Shift T', 'مهمة جديدة'], ['Esc', 'إغلاق اللوحة أو النافذة'], ['↑ ↓ ثم Enter', 'التنقل في نتائج البحث'], ['زر الفأرة الأيمن', 'قائمة إجراءات على القضايا والمهام والفواتير'], ['السحب والإفلات', 'نقل البطاقات بين المراحل، ورفع الملفات من أي مكان']];
   openModal(`<div class="m-h"><h3 class="h2 grow" style="font-weight:600">اختصارات لوحة المفاتيح</h3><button class="icon-btn" data-a="mClose">${ic('x')}</button></div><div class="m-b">${K_.map(([k, l]) => `<div class="row" style="padding:10px 0;border-bottom:1px solid var(--line)"><span class="grow">${l}</span><span class="kbd" style="margin:0;font-size:12px">${k}</span></div>`).join('')}</div>`);
+}
+
+/* ==========================================================
+   Navigation — shared portals, destinations and option search
+   Existing views, actions, icons and motion remain the source of truth.
+   ========================================================== */
+const PORTALS = [
+  { id: 'daily', l: 'العمل اليومي', ic: 'cal', desc: 'جلساتك ومهامك، في مكان واحد', routes: ['calendar', 'tasks'], quick: ['session', 'task'] },
+  { id: 'practice', l: 'القضايا والعملاء', ic: 'cases', desc: 'ملفات القضايا والعملاء والمستندات', routes: ['cases', 'clients', 'docs'], quick: ['case', 'client', 'doc'] },
+  { id: 'office', l: 'إدارة المكتب', ic: 'wallet', desc: 'الفريق والمالية وقراءة الأداء', routes: ['team', 'finance', 'analytics'], quick: ['invoice', 'expense'] },
+  { id: 'araf', l: 'خدمات أعراف', ic: 'sparkle', desc: 'التسويق والسكرتارية وكل خدمات الدعم', routes: ['services'], quick: [] },
+];
+const NAV_INFO = {
+  home: ['موجز المكتب والتنبيهات والمواعيد المهمة', 'الرئيسية لوحة التحكم داشبورد dashboard home'],
+  cases: ['متابعة القضايا ومراحلها وتفاصيلها', 'قضية دعوى ملف تقاضي cases'],
+  calendar: ['التقويم وتحضير الجلسات وتسجيل نتائجها', 'جلسة موعد مواعيد تقويم calendar'],
+  tasks: ['توزيع المهام ومتابعة الإنجاز والمراجعة', 'مهمة تكليف واجبات tasks'],
+  clients: ['ملفات العملاء والتواصل وسجل العلاقة', 'عميل موكل منشأة افراد clients'],
+  docs: ['المستندات والمرفقات والنسخ والموافقات', 'مستند وثيقة ملف ملفات ارشيف documents'],
+  team: ['أعضاء المكتب وتوزيع العمل والأداء', 'محامي محامين عضو زميل موظف team'],
+  finance: ['الفواتير والتحصيل والإيرادات والمتأخرات', 'فاتورة فواتير دفعات مصاريف حسابات مالية finance'],
+  analytics: ['مؤشرات المكتب والتقارير والمقارنات', 'تحليل احصاء احصائيات رسوم بيانية تقارير analytics'],
+  services: ['تصفح جميع خدمات أعراف واطلب ما تحتاجه', 'طلب خدمة من أعراف خدمة دعم استشارة تسويق سكرتارية services'],
+};
+S.navGroup = 'daily';
+S.portalId = '';
+S.serviceSection = '';
+S.navTarget = null;
+let navRouteKey = '';
+
+function portalForRoute(route = S.route) {
+  return PORTALS.find((g) => g.routes.includes(route === 'case' ? 'cases' : route));
+}
+function portalLinks(g) {
+  const links = g.routes.map((r) => {
+    const n = NAV.find((item) => item.r === r);
+    return { ...n, key: r, desc: NAV_INFO[r][0], aliases: NAV_INFO[r][1], group: g.id };
+  });
+  if (g.id === 'araf') {
+    Object.entries(SERVICES).forEach(([id, cat]) => links.push({
+      key: 'service-category-' + id, r: 'services', id, l: cat.l, ic: cat.ic,
+      desc: cat.items.length + ' خدمات — ' + cat.items.slice(0, 2).map((s) => s.t).join('، '),
+      aliases: cat.items.map((s) => s.t).join(' '), group: g.id,
+    }));
+    links.push({ key: 'requests', r: 'services', id: 'requests', l: 'تتبع طلباتي', ic: 'inbox', desc: 'حالة طلباتك والمطلوب منك ومخرجات الخدمات', aliases: 'طلب طلبات متابعة تتبع', group: g.id });
+  }
+  return links;
+}
+function navActive(n) {
+  if (n.r === 'services') return S.route === 'services' && (n.id || '') === S.serviceSection;
+  return S.route === n.r || (n.r === 'cases' && S.route === 'case');
+}
+function navAttrs(n) {
+  return 'data-a="nav" data-to="' + n.r + '"' + (n.id ? ' data-id="' + n.id + '"' : '');
+}
+function navButton(n, child = false) {
+  const c = n.cnt ? n.cnt() : '';
+  const count = c ? (typeof c === 'object' ? '<span class="cnt hot">' + c.n + '</span>' : '<span class="cnt">' + c + '</span>') : '';
+  return '<button class="nav-i ' + (child ? 'nav-child ' : '') + (n.cls || '') + (navActive(n) ? ' on' : '') + '" ' + navAttrs(n) +
+    ' aria-label="' + esc(n.l) + '" title="' + esc(n.l) + '"' + (navActive(n) ? ' aria-current="page"' : '') + '>' +
+    ic(n.ic) + '<span>' + esc(n.l) + '</span>' + count + '</button>';
+}
+function portalNav() {
+  const key = S.route + '/' + (S.portalId || '') + '/' + (S.serviceSection || '');
+  if (key !== navRouteKey) {
+    const group = portalForRoute();
+    if (group) S.navGroup = group.id;
+    navRouteKey = key;
+  }
+  return navButton(NAV[0]) +
+    navButton({ r: 'portals', l: 'كل البوابات', ic: 'grid' }) + '<div class="nav-sep"></div>' +
+    PORTALS.map((g) => '<section class="nav-portal" data-group="' + g.id + '">' +
+      '<button class="nav-i nav-portal-toggle' + (portalForRoute()?.id === g.id ? ' active-portal' : '') +
+      '" data-a="navGroup" data-id="' + g.id + '" aria-controls="nav-group-' + g.id + '" aria-expanded="false" title="' + esc(g.l) + '" aria-label="' + esc(g.l) + '">' +
+      ic(g.ic) + '<span>' + g.l + '</span>' + ic('chevD', 'class="portal-chevron"') + '</button>' +
+      '<div class="nav-children" id="nav-group-' + g.id + '" inert><div>' + portalLinks(g).map((n) => navButton(n, true)).join('') + '</div></div></section>').join('');
+}
+function compactNav() {
+  const app = $('#app');
+  return app.classList.contains('collapsed') || (innerWidth <= 1280 && !app.classList.contains('expanded'));
+}
+function syncNavGroups() {
+  $$('.nav-portal').forEach((el) => {
+    const open = !compactNav() && S.navGroup === el.dataset.group;
+    el.classList.toggle('is-open', open);
+    const toggle = $('.nav-portal-toggle', el);
+    if (compactNav()) {
+      toggle.removeAttribute('aria-expanded');
+      toggle.removeAttribute('aria-controls');
+    } else {
+      toggle.setAttribute('aria-expanded', String(open));
+      toggle.setAttribute('aria-controls', 'nav-group-' + el.dataset.group);
+    }
+    $('.nav-children', el).inert = !open;
+  });
+}
+A.navGroup = (el) => {
+  const group = PORTALS.find((g) => g.id === el.dataset.id);
+  if (!group) return;
+  if (compactNav()) return go('portals', group.id);
+  S.navGroup = S.navGroup === group.id ? '' : group.id;
+  syncNavGroups();
+};
+window.addEventListener('resize', syncNavGroups);
+
+function portalShortcuts() {
+  return '<section class="portal-shortcuts" aria-labelledby="portal-shortcuts-title">' +
+    '<div class="sec-h"><h2 class="sec-t" id="portal-shortcuts-title">إلى أين تريد الوصول؟</h2><button class="btn btn-sm btn-q" data-a="nav" data-to="portals">كل الخيارات' + ic('chevL') + '</button></div>' +
+    '<div class="portal-launchers">' + PORTALS.map((g) => '<button class="portal-launcher" data-a="nav" data-to="portals" data-id="' + g.id + '">' +
+      '<span class="portal-icon">' + ic(g.ic) + '</span><span class="grow"><b>' + g.l + '</b><small>' + g.desc + '</small></span>' + ic('chevL', 'class="portal-arrow"') + '</button>').join('') + '</div></section>';
+}
+VIEWS.portals = () => {
+  const selected = PORTALS.find((g) => g.id === S.portalId);
+  const groups = selected ? [selected] : PORTALS;
+  return '<div class="page-h"><div><h1 class="h-disp h1">' + (selected ? selected.l : 'بوابات المكتب') +
+    '</h1><p class="sub">' + (selected ? selected.desc : 'اختر ما تريد إنجازه؛ كل أقسام مكتبك وخدمات أعراف هنا.') +
+    '</p></div><div class="tools"><button class="btn btn-s" data-a="nav" data-to="home">' + ic('home') + 'العودة إلى اليوم</button></div></div>' +
+    '<button class="portal-search" data-a="cmd" aria-haspopup="dialog" aria-controls="cmd">' + ic('search') +
+    '<span class="grow"><b>ابحث عن أي خيار أو خدمة</b><small>مثل: استشارة تسويقية، مصروف، مذكرات القضية، أو رقم فاتورة</small></span><span class="kbd">Ctrl K</span></button>' +
+    '<div class="portal-filters" aria-label="تصفية البوابات"><button class="chip' + (!selected ? ' on' : '') +
+    '" data-a="nav" data-to="portals" aria-pressed="' + !selected + '">كل البوابات</button>' +
+    PORTALS.map((g) => '<button class="chip' + (selected?.id === g.id ? ' on' : '') + '" data-a="nav" data-to="portals" data-id="' + g.id +
+      '" aria-pressed="' + (selected?.id === g.id) + '">' + ic(g.ic) + g.l + '</button>').join('') + '</div>' +
+    '<div class="portal-grid' + (selected ? ' single' : '') + '">' + groups.map((g, index) =>
+      '<section class="portal-panel" style="--portal-delay:' + index * 45 + 'ms" aria-labelledby="portal-title-' + g.id + '">' +
+      '<div class="portal-panel-head"><span class="portal-icon">' + ic(g.ic) + '</span><div><h2 id="portal-title-' + g.id + '">' + g.l + '</h2><p>' + g.desc + '</p></div></div>' +
+      '<div class="portal-links">' + portalLinks(g).map((n) => '<button class="portal-link" ' + navAttrs(n) + '>' + ic(n.ic) +
+        '<span class="grow"><b>' + n.l + '</b><small>' + esc(n.desc) + '</small></span>' + ic('chevL', 'class="portal-arrow"') + '</button>').join('') + '</div>' +
+      (g.quick.length ? '<div class="portal-quick"><span>إضافة سريعة</span>' + g.quick.map((kind) => {
+        const q = QA.find((item) => item[0] === kind);
+        return '<button class="chip" data-a="quick" data-k="' + kind + '">' + ic(q[2]) + q[1] + '</button>';
+      }).join('') + '</div>' : '') + '</section>').join('') + '</div>' +
+    '<div class="portal-help"><button class="btn btn-q" data-a="notifs">' + ic('bell') + 'الإشعارات</button><button class="btn btn-q" data-a="settings">' +
+    ic('sliders') + 'الإعدادات</button><button class="btn btn-q" data-a="showShortcuts">' + ic('keyboard') + 'اختصارات لوحة المفاتيح</button></div>';
+};
+A.showShortcuts = () => shortcuts();
+
+/* Resolve destinations against known records; never use arbitrary hash text in selectors. */
+function parseNavigationHash(parts) {
+  S.portalId = S.route === 'portals' && PORTALS.some((g) => g.id === parts[1]) ? parts[1] : '';
+  S.navTarget = null;
+  if (S.route === 'services') {
+    const category = Object.prototype.hasOwnProperty.call(SERVICES, parts[1]);
+    S.serviceSection = parts[1] === 'requests' || category ? parts[1] : '';
+    if (category) S.svcCat = parts[1];
+    if (parts[1] === 'requests') {
+      const request = byId(REQUESTS, parts[2]);
+      S.navTarget = { kind: 'request', id: request?.id || '' };
+    } else if (category) S.navTarget = { kind: 'catalog' };
+  }
+  if (S.route === 'finance' && byId(INVOICES, parts[1])) {
+    S.finTab = 'all';
+    S.navTarget = { kind: 'invoice', id: parts[1] };
+  }
+}
+HOOKS.push((root) => {
+  const target = S.navTarget;
+  if (!target) return;
+  let el;
+  if (target.kind === 'catalog') el = $('#svcCats', root);
+  if (target.kind === 'request') el = target.id ? $$('[data-req]', root).find((row) => row.dataset.req === target.id) : $('#reqList', root);
+  if (target.kind === 'invoice') el = $$('.inv-row[data-ctx]', root).find((row) => row.dataset.ctx === 'inv:' + target.id);
+  if (!el) return;
+  S.navTarget = null;
+  el.classList.add('destination-focus');
+  el.setAttribute('tabindex', '-1');
+  el.focus({ preventScroll: true });
+  el.scrollIntoView({ behavior: 'auto', block: 'center' });
+});
+function openCaseSection(tab) {
+  if (S.route === 'case' && CS(S.id)) go('case', S.id, tab);
+  else openCmd({ caseTab: tab });
+}
+
+/* A fresh index reflects added records without storing client data elsewhere. */
+function optionEntries() {
+  const entry = (id, t, icon, f, m = '', aliases = '') => ({ id, t, ic: icon, f, m, aliases });
+  const routeEntries = [entry('route-home', 'اليوم', 'home', () => go('home'), NAV_INFO.home[0], NAV_INFO.home[1]),
+    entry('route-portals', 'كل البوابات', 'grid', () => go('portals'), 'دليل أقسام المكتب وخدمات أعراف', 'خيارات اقسام دليل بوابة')];
+  PORTALS.forEach((g) => {
+    routeEntries.push(entry('portal-' + g.id, g.l, g.ic, () => go('portals', g.id), g.desc, 'بوابة ' + g.l));
+    portalLinks(g).forEach((n) => routeEntries.push(entry('route-' + n.key, n.l, n.ic, () => go(n.r, n.id), g.l + ' — ' + n.desc, n.aliases)));
+  });
+  const quickNames = { task: 'إضافة مهمة', case: 'قضية جديدة', session: 'جلسة جديدة', client: 'عميل جديد', doc: 'رفع مستند', invoice: 'فاتورة جديدة', expense: 'إضافة مصروف' };
+  const quickAliases = { task: 'مهمة جديدة انشاء تكليف', case: 'اضافة انشاء قضية دعوى', session: 'اضافة موعد جلسة', client: 'اضافة موكل عميل', doc: 'اضافة ملف وثيقة مرفق رفع ملفات', invoice: 'اضافة انشاء فاتورة', expense: 'مصروف جديد مصاريف نفقات' };
+  const commands = QA.map(([kind, , icon, shortcut]) => ({ ...entry('quick-' + kind, quickNames[kind], icon, () => quickAdd(kind), 'فتح نموذج الإضافة', quickAliases[kind]), k: shortcut }));
+  [
+    ['brief', 'موجز اليوم', 'sun', () => A.brief(), 'ملخص يومك والمهل القريبة'],
+    ['weekly', 'مراجعة الأسبوع', 'activity', () => A.weekly(), 'الإنجاز ومقارنة الأسبوع السابق'],
+    ['notifs', 'الإشعارات', 'bell', openNotifs, 'التنبيهات والطلبات العاجلة'],
+    ['settings', 'الإعدادات', 'sliders', () => A.settings(), 'إعدادات المكتب'],
+    ['shortcuts', 'اختصارات لوحة المفاتيح', 'keyboard', shortcuts, 'طرق الوصول السريع'],
+    ['onboarding', 'تجربة البداية', 'sparkle', onboarding, 'تهيئة المكتب وخطوات البدء'],
+    ['profile', 'صفحتي', 'user', () => openMember('u1'), 'حسابي وملفي الشخصي'],
+    ['service-call', 'احجز مكالمة تعريفية', 'phone', () => A.svcConsult(), 'التعرف على خدمات أعراف'],
+  ].forEach((args) => commands.push(entry(...args)));
+  const view = (id, title, route, stateKey, value, icon, description) => commands.push(entry(id, title, icon, () => { S[stateKey] = value; go(route); }, description));
+  [['list', 'قائمة القضايا', 'list'], ['cards', 'بطاقات القضايا', 'grid'], ['kanban', 'مراحل القضايا', 'kanban'], ['gantt', 'الخط الزمني للقضايا', 'gantt']]
+    .forEach(([key, title, icon]) => view('cases-view-' + key, title, 'cases', 'casesView', key, icon, 'طريقة عرض القضايا'));
+  SAVED.forEach(([key, title]) => commands.push(entry('cases-saved-' + key, title, 'filter', () => { S.casesSaved = key; S.casesQ = ''; S.cf = {}; go('cases'); }, 'قائمة قضايا محفوظة')));
+  [['day', 'تقويم اليوم'], ['week', 'تقويم الأسبوع'], ['month', 'تقويم الشهر']]
+    .forEach(([key, title]) => view('calendar-' + key, title, 'calendar', 'calView', key, 'cal', 'عرض الجلسات والمواعيد'));
+  [['kanban', 'لوحة المهام', 'kanban'], ['list', 'قائمة المهام', 'list']]
+    .forEach(([key, title, icon]) => view('tasks-view-' + key, title, 'tasks', 'tasksView', key, icon, 'طريقة عرض المهام'));
+  [['mine', 'مهامي'], ['team', 'مهام الفريق'], ['upcoming', 'مهام خلال 7 أيام'], ['late', 'المهام المتأخرة']]
+    .forEach(([key, title]) => view('tasks-scope-' + key, title, 'tasks', 'tasksScope', key, 'tasks', 'متابعة المهام'));
+  [['all', 'كل العملاء'], ['org', 'عملاء المنشآت'], ['ind', 'العملاء الأفراد'], ['stale', 'عملاء بحاجة لتواصل']]
+    .forEach(([key, title]) => view('clients-' + key, title, 'clients', 'clientF', key, 'users', 'تصفية العملاء'));
+  [['all', 'كل الفواتير'], ['due', 'الفواتير المستحقة'], ['overdue', 'الفواتير المتأخرة'], ['paid', 'الفواتير المدفوعة']]
+    .forEach(([key, title]) => view('finance-' + key, title, 'finance', 'finTab', key, 'receipt', 'المالية والتحصيل'));
+  [['month', 'تحليلات هذا الشهر'], ['year', 'تحليلات هذا العام']]
+    .forEach(([key, title]) => view('analytics-' + key, title, 'analytics', 'anPeriod', key, 'chart', 'مؤشرات الأداء'));
+  [...new Set(DOCS.map((d) => d.type))].forEach((type) => view('docs-' + type, 'مستندات: ' + type, 'docs', 'docType', type, 'file', 'تصفية المستندات حسب النوع'));
+  const sectionNames = { overview: 'نظرة عامة على القضية', timeline: 'الخط الزمني للقضية', sessions: 'جلسات القضية', tasks: 'مهام القضية', docs: 'مستندات القضية', memos: 'مذكرات القضية', notes: 'ملاحظات القضية', client: 'عميل القضية', invoices: 'فواتير القضية', team: 'فريق القضية' };
+  CTABS.forEach(([tab, title]) => commands.push(entry('case-tab-' + tab, sectionNames[tab], 'cases', () => openCaseSection(tab), S.route === 'case' && CS(S.id) ? CS(S.id).title : 'اختر القضية لفتح هذا القسم', title.replace(/ال/g, ''))));
+  const services = Object.entries(SERVICES).flatMap(([cat, data]) => data.items.map((s) =>
+    entry('service-' + s.id, s.t, data.ic, () => A.svcRequest({ dataset: { id: s.id } }), data.l + ' — ' + s.dur, [data.l, s.p, ...s.get].join(' '))));
+  return [['الأقسام والبوابات', routeEntries, 'options'], ['الخيارات والإجراءات', commands, 'options'], ['خدمات أعراف', services, 'services']];
+}
+function recordEntries() {
+  return [
+    ['القضايا', CASES.map((c) => ({ id: 'case-' + c.id, t: c.title, m: c.type + ' — ' + c.no + ' — ' + STATUS[c.status].l, ic: 'cases', aliases: [c.no, c.opp, c.subj, c.court, K(c.client)?.name].join(' '), f: () => go('case', c.id) }))],
+    ['العملاء', CLIENTS.map((c) => ({ id: 'client-' + c.id, t: c.name, m: c.kind + ' — ' + clientCases(c.id).length + ' قضايا', aliases: [c.contact, c.phone, c.email].join(' '), ic: 'users', f: () => { S.clientF = 'all'; S.clientId = c.id; go('clients'); } }))],
+    ['المهام', TASKS.map((t) => ({ id: 'task-' + t.id, t: t.t, m: U(t.who).short + ' — ' + TST[t.st][0] + ' — ' + rel(t.due), aliases: t.case ? CS(t.case)?.title : '', ic: 'tasks', f: () => A.openTask({ dataset: { id: t.id } }) }))],
+    ['الجلسات', SESSIONS.map((s) => ({ id: 'session-' + s.id, t: 'جلسة ' + dm(s.at) + ' — ' + CS(s.case).title, m: CS(s.case).court + ' — ' + U(s.by).name, aliases: [CS(s.case).no, s.kind, s.result].join(' '), ic: 'cal', f: () => openSession(s.id) }))],
+    ['المستندات', DOCS.map((d) => ({ id: 'doc-' + d.id, t: d.name, m: d.type + (d.case ? ' — ' + CS(d.case)?.title : ''), ic: 'file', f: () => A.openDoc({ dataset: { id: d.id } }) }))],
+    ['الفواتير', INVOICES.map((i) => ({ id: 'invoice-' + i.id, t: i.id + ' — ' + K(i.client).name, m: fmt(i.amt) + ' ريال — ' + ({ paid: 'مدفوعة', overdue: 'متأخرة', due: 'مستحقة' }[i.st] || i.st), aliases: 'فاتورة فواتير ' + i.amt, ic: 'receipt', f: () => go('finance', i.id) }))],
+    ['الفريق', TEAM.map((u) => ({ id: 'member-' + u.id, t: u.name, m: u.role, ic: 'team', aliases: u.short, f: () => openMember(u.id) }))],
+    ['طلبات أعراف', REQUESTS.map((r) => ({ id: 'request-' + r.id, t: r.svc, m: r.id + ' — ' + REQ_STEPS[r.st], aliases: [r.id, r.note, r.who, 'طلب طلبات'].join(' '), ic: 'inbox', f: () => go('services', 'requests', r.id) }))],
+  ].map(([label, entries]) => [label, entries, 'records']);
+}
+function searchText(value) {
+  return norm(String(value ?? '').normalize('NFKC'))
+    .replace(/[\u0610-\u061a\u064b-\u065f\u0670\u06d6-\u06ed]/g, '')
+    .replace(/[٠-٩]/g, (d) => String(d.charCodeAt(0) - 0x660))
+    .replace(/[۰-۹]/g, (d) => String(d.charCodeAt(0) - 0x6f0))
+    .replace(/\s+/g, ' ').trim();
+}
+function searchScore(item, query) {
+  const q = searchText(query);
+  if (!q) return 1;
+  const title = searchText(item.t), full = searchText([item.t, item.m, item.aliases].join(' '));
+  const words = q.split(' ');
+  if (!words.every((word) => full.includes(word))) return 0;
+  return title === q ? 100 : title.startsWith(q) ? 80 : title.includes(q) ? 60 : words.every((word) => title.includes(word)) ? 40 : 20;
+}
+function searchGroups(query, scope = 'all', caseTab = '') {
+  let groups;
+  if (caseTab) {
+    groups = [recordEntries()[0]];
+    groups[0][1] = groups[0][1].map((item, index) => ({ ...item, f: () => go('case', CASES[index].id, caseTab) }));
+  } else groups = [...optionEntries(), ...recordEntries()].filter((g) => scope === 'all' || g[2] === scope);
+  const matches = groups.map(([label, items, kind]) => [label, items.map((item, order) => ({ item, order, score: searchScore(item, query) }))
+    .filter((hit) => hit.score > 0).sort((a, b) => b.score - a.score || a.order - b.order).map((hit) => hit.item), kind]).filter((g) => g[1].length);
+  return searchText(query) ? matches.sort((a, b) => searchScore(b[1][0], query) - searchScore(a[1][0], query)) : matches;
 }
 </script>
 <script>shell(); parseHash(); render(false);</script>
