@@ -1,0 +1,10 @@
+{
+  "name": "araf-lawyers",
+  "private": true,
+  "scripts": {
+    "test": "node tests/navigation.test.cjs"
+  },
+  "devDependencies": {
+    "linkedom": "0.18.12"
+  }
+}

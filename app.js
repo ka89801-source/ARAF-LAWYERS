@@ -18,7 +18,7 @@ const NAV = [
   '-',
   { r: 'services', l: 'خدمات أعراف', ic: 'sparkle', cls: 'services' },
 ];
-const TITLES = { home: 'اليوم', cases: 'القضايا', calendar: 'الجلسات', tasks: 'المهام', clients: 'العملاء', docs: 'المستندات', team: 'الفريق', finance: 'المالية', analytics: 'التحليلات', services: 'خدمات أعراف' };
+const TITLES = { portals: 'بوابات المكتب', home: 'اليوم', cases: 'القضايا', calendar: 'الجلسات', tasks: 'المهام', clients: 'العملاء', docs: 'المستندات', team: 'الفريق', finance: 'المالية', analytics: 'التحليلات', services: 'خدمات أعراف' };
 
 function shell() {
   const unread = NOTIFS.filter((n) => n.unread).length;
@@ -26,7 +26,7 @@ function shell() {
   <div class="app" id="app">
     <aside class="side">
       <div class="brand"><div class="brand-mark">${LOGO}</div><div class="brand-txt"><b>أعراف</b><small>للمحامين</small></div></div>
-      <nav class="nav-group" id="nav"></nav>
+      <nav class="nav-group" id="nav" aria-label="التنقل الرئيسي"></nav>
       <div class="side-foot">
         <button class="nav-i" data-a="notifs">${ic('bell')}<span>الإشعارات</span><span class="cnt hot" id="navNotif">${unread}</span></button>
         <button class="nav-i" data-a="settings">${ic('sliders')}<span>الإعدادات</span></button>
@@ -35,9 +35,9 @@ function shell() {
     </aside>
     <main class="main"><div class="sheet">
       <header class="topbar">
-        <button class="icon-btn" data-a="toggleSide" data-tip="طي القائمة">${ic('menu')}</button>
+        <button class="icon-btn" data-a="toggleSide" data-tip="القائمة والبوابات" aria-label="فتح القائمة والبوابات">${ic('menu')}</button>
         <div class="crumbs" id="crumbs"></div>
-        <button class="searchbtn" data-a="cmd">${ic('search')}<span>ابحث عن قضية أو عميل، أو نفّذ أمرًا</span><span class="kbd">Ctrl K</span></button>
+        <button class="searchbtn" data-a="cmd" aria-haspopup="dialog" aria-controls="cmd" aria-label="ابحث عن أي خيار أو خدمة">${ic('search')}<span>ابحث عن أي خيار أو خدمة…</span><span class="kbd">Ctrl K</span></button>
         <div class="today-chip"><b>${wd(TODAY)}، ${dm(TODAY)}</b><span>${hijri(TODAY)}</span></div>
         <button class="icon-btn" data-a="notifs" data-tip="الإشعارات">${ic('bell')}<span class="dot" id="bellDot">${unread}</span></button>
       </header>
@@ -56,22 +56,27 @@ function shell() {
   paintNav();
 }
 function paintNav() {
-  $('#nav').innerHTML = NAV.map((n) => {
-    if (n === '-') return '<div class="nav-sep"></div>';
-    const c = n.cnt ? n.cnt() : ''; const on = S.route === n.r || (n.r === 'cases' && S.route === 'case');
-    const cnt = c ? (typeof c === 'object' ? `<span class="cnt hot">${c.n}</span>` : `<span class="cnt">${c}</span>`) : '';
-    return `<button class="nav-i ${n.cls || ''} ${on ? 'on' : ''}" data-a="nav" data-to="${n.r}">${ic(n.ic)}<span>${n.l}</span>${cnt}</button>`;
-  }).join('');
-  const mob = [['home', 'اليوم', 'home'], ['calendar', 'الجلسات', 'cal'], ['tasks', 'المهام', 'tasks'], ['cases', 'القضايا', 'cases'], ['more', 'المزيد', 'menu']];
+  $('#nav').innerHTML = portalNav();
+  syncNavGroups();
+  const mob = [['home', 'اليوم', 'home'], ['calendar', 'الجلسات', 'cal'], ['tasks', 'المهام', 'tasks'], ['cases', 'القضايا', 'cases'], ['portals', 'البوابات', 'grid']];
   const late = TASKS.filter((t) => t.who === 'u1' && isLate(t)).length;
-  $('#mnav').innerHTML = mob.map(([r, l, i]) => `<button class="${S.route === r || (r === 'cases' && S.route === 'case') ? 'on' : ''}" data-a="${r === 'more' ? 'mobMore' : 'nav'}" data-to="${r}">${ic(i)}${l}${r === 'tasks' && late ? `<span class="cnt">${late}</span>` : ''}</button>`).join('');
+  $('#mnav').innerHTML = mob.map(([r, l, i]) => `<button class="${S.route === r || (r === 'cases' && S.route === 'case') ? 'on' : ''}" data-a="nav" data-to="${r}">${ic(i)}${l}${r === 'tasks' && late ? `<span class="cnt">${late}</span>` : ''}</button>`).join('');
   const un = NOTIFS.filter((n) => n.unread).length;
   $('#bellDot').textContent = un; $('#bellDot').style.display = un ? '' : 'none'; $('#navNotif').textContent = un; $('#navNotif').style.display = un ? '' : 'none';
 }
 function crumbs() {
+  const group = portalForRoute();
   let h = '';
-  if (S.route === 'case') { const c = CS(S.id); h = `<button data-a="nav" data-to="cases">القضايا</button>${ic('chevL')}<b>${c.title}</b>`; }
-  else h = `<b>${TITLES[S.route]}</b>`;
+  if (S.route === 'case') {
+    const c = CS(S.id);
+    h = '<button data-a="nav" data-to="portals" data-id="practice">القضايا والعملاء</button>' + ic('chevL') +
+      '<button data-a="nav" data-to="cases">القضايا</button>' + ic('chevL') + '<b>' + esc(c.title) + '</b>';
+  } else if (S.route === 'portals' && S.portalId) {
+    h = '<button data-a="nav" data-to="portals">كل البوابات</button>' + ic('chevL') + '<b>' + PORTALS.find((g) => g.id === S.portalId).l + '</b>';
+  } else if (group) {
+    h = '<button data-a="nav" data-to="portals" data-id="' + group.id + '">' + group.l + '</button>' + ic('chevL') +
+      '<b>' + (S.route === 'services' && S.serviceSection ? (SERVICES[S.serviceSection]?.l || 'تتبع طلباتي') : TITLES[S.route]) + '</b>';
+  } else h = '<b>' + TITLES[S.route] + '</b>';
   $('#crumbs').innerHTML = h;
 }
 
@@ -81,12 +86,13 @@ function parseHash() {
   const p = location.hash.replace(/^#\/?/, '').split('/');
   const r = p[0] || 'home';
   if (r === 'case' && CS(p[1])) { S.route = 'case'; S.id = p[1]; S.tab = p[2] || 'overview'; }
-  else if (VIEWS[r]) { S.route = r; }
+  else if (Object.prototype.hasOwnProperty.call(VIEWS, r)) { S.route = r; }
   else S.route = 'home';
+  parseNavigationHash(p);
 }
 function go(route, id, tab) {
   const h = '#/' + route + (id ? '/' + id : '') + (tab ? '/' + tab : '');
-  if (location.hash === h) render(true); else location.hash = h;
+  if (location.hash === h) { parseHash(); render(true); } else location.hash = h;
 }
 function render(anim = true) {
   closePop(); $('#peek')?.remove(); tipEl?.classList.remove('show');
@@ -98,9 +104,9 @@ function render(anim = true) {
     if (anim) { v.classList.remove('enter'); void v.offsetWidth; v.classList.add('enter'); }
     after(v);
   };
+  if (anim) $('#scroll').scrollTop = 0;
   if (first) { v.innerHTML = skeleton(); v.classList.remove('enter'); setTimeout(paint, 260); } else paint();
   paintNav(); crumbs();
-  if (anim) $('#scroll').scrollTop = 0;
 }
 function rerender() { const sc = $('#scroll').scrollTop; $('#view').innerHTML = VIEWS[S.route](); after($('#view')); $('#scroll').scrollTop = sc; paintNav(); }
 function after(root) { runCounters(root); runRings(root); syncIndicators(root); HOOKS.forEach((f) => f(root)); }
@@ -136,16 +142,16 @@ document.addEventListener('keydown', (e) => {
   if (e.shiftKey && e.key === 'T') { quickAdd('task'); }
 });
 
-A.nav = (el) => go(el.dataset.to);
+A.nav = (el) => { closeDrawer(); closeModal(); go(el.dataset.to, el.dataset.id, el.dataset.tab); };
 A.openCase = (el, e) => { e?.stopPropagation(); go('case', el.dataset.id, el.dataset.tab); closeDrawer(); closeModal(); };
 A.drClose = closeDrawer; A.drBack = drawerBack; A.mClose = closeModal;
-A.toggleSide = () => { const a = $('#app'); if (innerWidth <= 1280) a.classList.toggle('expanded'); else a.classList.toggle('collapsed'); setTimeout(() => syncIndicators(), 360); };
+A.toggleSide = () => { if (innerWidth <= 760) return go('portals'); const a = $('#app'); if (innerWidth <= 1280) { a.classList.remove('collapsed'); a.classList.toggle('expanded'); } else { a.classList.remove('expanded'); a.classList.toggle('collapsed'); } syncNavGroups(); setTimeout(() => syncIndicators(), 360); };
 A.seg = (el) => { S[el.dataset.k] = el.dataset.v; rerender(); };
 A.stop = (el, e) => e.stopPropagation();
 A.copy = (el, e) => { e.stopPropagation(); navigator.clipboard?.writeText(el.dataset.v); toast(`نُسخ الرقم ${'<span class="ltr num">' + el.dataset.v + '</span>'}`); };
 A.meMenu = (el) => openPop(el, [{ h: 'أ. خالد — الشريك المؤسس' }, { l: 'صفحتي', ic: 'user', f: () => openMember('u1') }, { l: 'تجربة البداية', ic: 'sparkle', f: onboarding }, { l: 'اختصارات لوحة المفاتيح', ic: 'keyboard', f: shortcuts }, '-', { l: 'تسجيل الخروج', ic: 'logout', red: true, f: () => toast('هذه نسخة تجريبية؛ تسجيل الخروج غير مفعّل', { info: true }) }], { alignStart: true });
 A.settings = () => toast('الإعدادات خارج نطاق هذه النسخة التجريبية', { info: true });
-A.mobMore = (el) => openPop(el, [['clients', 'العملاء', 'users'], ['docs', 'المستندات', 'file'], ['team', 'الفريق', 'team'], ['finance', 'المالية', 'wallet'], ['analytics', 'التحليلات', 'chart'], ['services', 'خدمات أعراف', 'sparkle']].map(([r, l, i]) => ({ l, ic: i, f: () => go(r) })).concat(['-', { l: 'الإشعارات', ic: 'bell', f: openNotifs }]));
+A.mobMore = () => go('portals');
 window.addEventListener('resize', () => syncIndicators());
 
 /* ==========================================================
@@ -196,6 +202,8 @@ VIEWS.home = () => {
       <div class="key">${ic('alert')}<span>أهم شيء اليوم: تنتهي مهلة الاعتراض في قضية شركة نماء ${rel(nearDl.at)}.</span></div>
     </div>
   </section>
+
+  ${portalShortcuts()}
 
   <section class="ribbon">
     <div class="rb-h"><div class="sec-t">يومك<small>من 8 صباحًا حتى 6 مساءً</small></div>

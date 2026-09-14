@@ -80,7 +80,7 @@ VIEWS.services = () => {
 
   <div class="feat"><div class="ic">${ic('trend', 'width="22" height="22"')}</div><div><div style="font-weight:600;font-size:15px">القضايا التجارية نمت لديك 22% خلال ربع واحد</div><div class="muted" style="font-size:13px">مكاتب مماثلة تحوّل هذا النمو إلى حضور مهني عبر خطة محتوى تجارية موجهة لأصحاب المنشآت. نبدأ بقراءة ما يبحث عنه عملاؤك الحاليون.</div></div><button class="btn btn-p" data-a="svcRequest" data-id="sv4">خطة محتوى تجاري</button></div>
 
-  <div class="cat-nav" id="svcCats">${Object.entries(SERVICES).map(([k, v]) => `<button class="${S.svcCat === k ? 'on' : ''}" data-a="seg" data-k="svcCat" data-v="${k}">${ic(v.ic)}${v.l}<span class="muted" style="font-size:11.5px;${S.svcCat === k ? 'color:rgba(255,255,255,.6)' : ''}">${v.items.length}</span></button>`).join('')}</div>
+  <div class="cat-nav" id="svcCats">${Object.entries(SERVICES).map(([k, v]) => `<button class="${S.svcCat === k ? 'on' : ''}" data-a="nav" data-to="services" data-id="${k}">${ic(v.ic)}${v.l}<span class="muted" style="font-size:11.5px;${S.svcCat === k ? 'color:rgba(255,255,255,.6)' : ''}">${v.items.length}</span></button>`).join('')}</div>
   ${S.svcCat === 'marketing' ? `<p class="muted" style="font-size:12.5px;margin:-10px 0 16px">${ic('lock', 'width="13" height="13" style="display:inline;vertical-align:-2px"')} نلتزم في كل خدمة تسويقية بالضوابط المهنية للإعلان عن خدمات المحاماة في المملكة.</p>` : ''}
   <div class="svc-grid">${cat.items.map((s, i) => `<article class="svc" style="animation:rbIn .5s var(--ease-out) ${i * 40}ms both">${s.tag ? `<span class="tag badge b-gold">${s.tag}</span>` : ''}<div class="ic">${ic(cat.ic)}</div><h3>${s.t}</h3><p>${s.p}</p><ul>${s.get.map((g) => `<li>${ic('check')}${g}</li>`).join('')}</ul>
     <div class="foot"><div class="price"><small>يبدأ من</small><b>${sar(s.price)}</b>${s.unit ? ` <small style="display:inline">${s.unit}</small>` : ''}</div><span class="grow"></span><span class="muted" style="font-size:12px">${ic('clock', 'width="13" height="13" style="display:inline;vertical-align:-2px"')} ${s.dur}</span><button class="btn btn-sm btn-p" data-a="svcRequest" data-id="${s.id}">اطلب</button></div></article>`).join('')}</div>
@@ -147,52 +147,185 @@ A.nAct = (el) => {
 };
 
 /* ==========================================================
-   COMMAND PALETTE
+   SEARCH — options, services and records in one command palette
    ========================================================== */
-const CMDS = [
-  ['إضافة مهمة', 'plus', () => quickAdd('task'), 'Shift T'], ['قضية جديدة', 'cases', () => quickAdd('case')], ['جلسة جديدة', 'cal', () => quickAdd('session')], ['عميل جديد', 'users', () => quickAdd('client')], ['فاتورة جديدة', 'receipt', () => quickAdd('invoice')], ['رفع مستند', 'upload', () => A.fakeUpload()],
-  ['موجز اليوم', 'sun', () => A.brief()], ['مراجعة الأسبوع', 'activity', () => A.weekly()], ['الإشعارات', 'bell', openNotifs],
-  ...NAV.filter((n) => n !== '-').map((n) => [`الانتقال إلى ${n.l}`, n.ic, () => go(n.r)]),
-  ['طلب خدمة من أعراف', 'sparkle', () => go('services')], ['اختصارات لوحة المفاتيح', 'keyboard', () => shortcuts()],
-];
-let cmdIdx = 0, cmdItems = [];
-function openCmd() {
-  const w = $('#cmd'); w.innerHTML = `<div class="cmd"><div class="cmd-in">${ic('search')}<input id="cmdQ" placeholder="ابحث في القضايا والعملاء والمهام والجلسات، أو اكتب أمرًا" autocomplete="off"><span class="kbd">Esc</span></div><div class="cmd-res" id="cmdRes"></div>
-    <div class="cmd-foot"><span><span class="kbd">↑↓</span>تنقل</span><span><span class="kbd">Enter</span>فتح</span><span><span class="kbd">Esc</span>إغلاق</span><span style="margin-inline-start:auto">جرّب: «العم» أو «456» أو «فاتورة»</span></div></div>`;
-  w.classList.add('show'); w.onclick = (e) => { if (e.target === w) closeCmd(); };
-  const q = $('#cmdQ'); q.focus(); q.oninput = () => cmdSearch(q.value);
-  q.onkeydown = (e) => { if (e.key === 'ArrowDown') { e.preventDefault(); cmdIdx = Math.min(cmdItems.length - 1, cmdIdx + 1); cmdPaint(); } if (e.key === 'ArrowUp') { e.preventDefault(); cmdIdx = Math.max(0, cmdIdx - 1); cmdPaint(); } if (e.key === 'Enter') { e.preventDefault(); cmdRun(cmdIdx); } };
+const CMD_SCOPES = [['all', 'الكل'], ['options', 'الخيارات'], ['services', 'الخدمات'], ['records', 'السجلات']];
+let cmdIdx = 0, cmdItems = [], cmdScope = 'all', cmdCaseTab = '', cmdReturnFocus = null;
+let cmdExpanded = new Set();
+function openCmd(options = {}) {
+  const w = $('#cmd');
+  if (w.classList.contains('show') && !options.caseTab && !options.scope) { $('#cmdQ')?.focus(); return; }
+  if (!w.classList.contains('show')) cmdReturnFocus = document.activeElement;
+  cmdScope = CMD_SCOPES.some(([key]) => key === options.scope) ? options.scope : 'all';
+  cmdCaseTab = CTABS.some(([key]) => key === options.caseTab) ? options.caseTab : '';
+  cmdExpanded = new Set();
+  const section = CTABS.find(([key]) => key === cmdCaseTab);
+  w.innerHTML = '<div class="cmd" role="dialog" aria-modal="true" aria-labelledby="cmdTitle">' +
+    '<h2 class="sr-only" id="cmdTitle">' + (section ? 'اختر قضية لفتح ' + section[1] : 'البحث في أعراف') + '</h2>' +
+    '<div class="cmd-in">' + ic('search') + '<input id="cmdQ" type="text" role="combobox" aria-label="' +
+    (section ? 'ابحث عن القضية' : 'ابحث عن أي خيار أو خدمة أو سجل') +
+    '" aria-autocomplete="list" aria-expanded="true" aria-controls="cmdRes" autocomplete="off" spellcheck="false" maxlength="160" placeholder="' +
+    (section ? 'ابحث باسم القضية أو رقمها…' : 'ما الذي تريد الوصول إليه؟') +
+    '"><button class="icon-btn cmd-close" data-a="cmdClose" aria-label="إغلاق البحث">' + ic('x') + '</button></div>' +
+    (section ? '<div class="cmd-context"><span>اختر قضية لفتح <b>' + section[1] +
+      '</b></span><button class="btn btn-sm btn-q" data-a="cmdReset">كل الخيارات</button></div>' :
+      '<div class="cmd-scopes" aria-label="نطاق البحث">' + CMD_SCOPES.map(([key, label]) =>
+        '<button data-a="cmdScope" data-scope="' + key + '" aria-pressed="' + (cmdScope === key) + '" class="' +
+        (cmdScope === key ? 'on' : '') + '">' + label + '</button>').join('') + '</div>') +
+    '<div class="cmd-res" id="cmdRes" role="listbox" aria-label="نتائج البحث"></div>' +
+    '<div class="cmd-foot"><span class="cmd-key-help"><span class="kbd">↑↓</span>تنقل <span class="kbd">Enter</span>فتح</span>' +
+    '<span id="cmdStatus" role="status" aria-live="polite"></span></div></div>';
+  w.inert = false;
+  w.classList.add('show');
+  w.onclick = (e) => { if (e.target === w) closeCmd(); };
+  const q = $('#cmdQ');
+  q.oninput = () => { cmdExpanded.clear(); cmdSearch(q.value); };
+  w.onkeydown = (e) => {
+    e.stopPropagation();
+    if (e.key === 'Escape') { e.preventDefault(); closeCmd(); return; }
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); q.focus(); return; }
+    if (e.key === 'Tab') {
+      const focusable = $$('input, button', w);
+      const first = focusable[0], last = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+      return;
+    }
+    if (e.target !== q || e.isComposing) return;
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      if (!cmdItems.length) return;
+      cmdIdx = (cmdIdx + (e.key === 'ArrowDown' ? 1 : -1) + cmdItems.length) % cmdItems.length;
+      cmdPaint();
+    }
+    if (e.key === 'Enter') { e.preventDefault(); cmdRun(cmdIdx); }
+  };
   cmdSearch('');
+  q.focus();
 }
-function closeCmd() { $('#cmd').classList.remove('show'); }
-A.cmd = openCmd;
-function hl(text, q) { if (!q) return esc(text); const nt = norm(text), nq = norm(q); const i = nt.indexOf(nq); if (i < 0) return esc(text); return esc(text.slice(0, i)) + '<mark>' + esc(text.slice(i, i + q.length)) + '</mark>' + esc(text.slice(i + q.length)); }
-function cmdSearch(q) {
-  const nq = norm(q.trim()); const m = (s) => !nq || norm(s).includes(nq);
-  const G = [];
-  if (!nq) {
-    G.push(['مقترحات الآن', [
-      { t: 'تقديم مذكرة التعقيب — الأفق', m: 'موعد نهائي اليوم 4:30 م', ic: 'clock', f: () => A.openTask({ dataset: { id: 't2' } }) },
-      { t: 'شركة نماء ضد مؤسسة الإعمار الحديث', m: 'مهلة الاعتراض تنتهي بعد يومين', ic: 'alert', f: () => go('case', 'c3') },
-      { t: 'جلسة المحكمة العمالية 11:30', m: 'محمد الغامدي ضد شركة البيان', ic: 'cal', f: () => openSession('s7') }]]);
-    G.push(['أوامر', CMDS.slice(0, 6).map(([t, i, f, k]) => ({ t, ic: i, f, k }))]);
-  } else {
-    const cs = CASES.filter((c) => m(c.title + ' ' + c.no + ' ' + c.opp + ' ' + c.type + ' ' + c.subj)).slice(0, 5).map((c) => ({ t: c.title, m: `${c.type} — ${c.no} — ${STATUS[c.status].l}`, ic: 'cases', f: () => go('case', c.id) }));
-    const kl = CLIENTS.filter((c) => m(c.name + ' ' + (c.contact || ''))).slice(0, 4).map((c) => ({ t: c.name, m: `${c.kind} — ${clientCases(c.id).length} قضايا`, ic: 'users', f: () => { S.clientId = c.id; go('clients'); } }));
-    const ts = TASKS.filter((t) => t.st !== 'done' && m(t.t)).slice(0, 4).map((t) => ({ t: t.t, m: `${U(t.who).short} — ${rel(t.due)}`, ic: 'tasks', f: () => A.openTask({ dataset: { id: t.id } }) }));
-    const ss = SESSIONS.filter((s) => s.at >= sod(TODAY) && m(CS(s.case).title + ' ' + CS(s.case).court + ' جلسة')).slice(0, 3).map((s) => ({ t: `جلسة ${dm(s.at)} — ${CS(s.case).title}`, m: CS(s.case).court, ic: 'cal', f: () => openSession(s.id) }));
-    const ds = DOCS.filter((d) => m(d.name + ' ' + d.type)).slice(0, 3).map((d) => ({ t: d.name, m: d.type + (d.case ? ' — ' + CS(d.case).title : ''), ic: 'file', f: () => A.openDoc({ dataset: { id: d.id } }) }));
-    const cm = CMDS.filter(([t]) => m(t)).slice(0, 4).map(([t, i, f, k]) => ({ t, ic: i, f, k }));
-    [['القضايا', cs], ['العملاء', kl], ['المهام', ts], ['الجلسات', ss], ['المستندات', ds], ['أوامر', cm]].forEach((g) => g[1].length && G.push(g));
+function closeCmd(restoreFocus = true) {
+  const w = $('#cmd');
+  w.classList.remove('show');
+  w.inert = true;
+  setTimeout(() => { if (!w.classList.contains('show')) w.innerHTML = ''; }, 180);
+  w.onclick = null;
+  w.onkeydown = null;
+  if (restoreFocus && cmdReturnFocus?.isConnected) cmdReturnFocus.focus({ preventScroll: true });
+  cmdReturnFocus = null;
+}
+A.cmd = () => openCmd();
+A.cmdClose = () => closeCmd();
+A.cmdReset = () => openCmd({ scope: 'all' });
+A.cmdScope = (el) => {
+  if (!CMD_SCOPES.some(([key]) => key === el.dataset.scope)) return;
+  cmdScope = el.dataset.scope;
+  cmdExpanded.clear();
+  $$('.cmd-scopes button').forEach((b) => {
+    b.classList.toggle('on', b.dataset.scope === cmdScope);
+    b.setAttribute('aria-pressed', String(b.dataset.scope === cmdScope));
+  });
+  cmdSearch($('#cmdQ').value);
+  $('#cmdQ').focus();
+};
+function hl(value, query) {
+  const text = String(value ?? '');
+  const words = searchText(query).split(' ').filter(Boolean);
+  if (!words.length) return esc(text);
+  let normalized = '', offset = 0;
+  const positions = [];
+  for (const char of text) {
+    const part = searchText(char) || (/\s/.test(char) ? ' ' : '');
+    normalized += part;
+    for (let unit = 0; unit < part.length; unit++) positions.push([offset, offset + char.length]);
+    offset += char.length;
   }
-  cmdItems = G.flatMap((g) => g[1]); cmdIdx = 0;
-  let i = 0; $('#cmdRes').innerHTML = cmdItems.length ? G.map(([l, items]) => `<div class="cmd-g">${l}</div>` + items.map((it) => `<div class="cmd-i" data-ci="${i++}"><div class="ic">${ic(it.ic)}</div><div class="grow" style="min-width:0"><div class="t ell">${hl(it.t, q.trim())}</div>${it.m ? `<div class="m ell">${it.m}</div>` : ''}</div>${it.k ? `<span class="kbd">${it.k}</span>` : `<span class="go">فتح ${ic('chevL', 'width="12" height="12"')}</span>`}</div>`).join('')).join('')
-    : `<div class="empty" style="padding:34px">${emptyArt()}<b>لا نتائج لـ «${esc(q)}»</b><p>جرّب رقم القضية أو جزءًا من اسم العميل. البحث يتجاهل الهمزات والتاء المربوطة.</p></div>`;
-  $$('#cmdRes .cmd-i').forEach((el) => { el.onmouseenter = () => { cmdIdx = +el.dataset.ci; cmdPaint(false); }; el.onclick = () => cmdRun(+el.dataset.ci); });
-  cmdPaint();
+  const ranges = [];
+  words.forEach((word) => {
+    let from = 0, at;
+    while ((at = normalized.indexOf(word, from)) !== -1) {
+      ranges.push([positions[at][0], positions[at + word.length - 1][1]]);
+      from = at + word.length;
+    }
+  });
+  ranges.sort((a, b) => a[0] - b[0]);
+  const merged = [];
+  ranges.forEach(([start, end]) => {
+    const last = merged[merged.length - 1];
+    if (last && start <= last[1]) last[1] = Math.max(last[1], end);
+    else merged.push([start, end]);
+  });
+  let html = '', cursor = 0;
+  merged.forEach(([start, end]) => { html += esc(text.slice(cursor, start)) + '<mark>' + esc(text.slice(start, end)) + '</mark>'; cursor = end; });
+  return html + esc(text.slice(cursor));
 }
-function cmdPaint(scroll = true) { $$('#cmdRes .cmd-i').forEach((el) => el.classList.toggle('act', +el.dataset.ci === cmdIdx)); if (scroll) $('#cmdRes .cmd-i.act')?.scrollIntoView({ block: 'nearest' }); }
-function cmdRun(i) { const it = cmdItems[i]; if (!it) return; closeCmd(); closeDrawer(); setTimeout(it.f, 60); }
+function cmdSearch(query) {
+  const q = query.trim();
+  let groups;
+  if (!searchText(q) && cmdScope === 'all' && !cmdCaseTab) {
+    const options = optionEntries();
+    groups = [
+      ['بوابات المكتب', options[0][1].filter((item) => item.id.startsWith('portal-'))],
+      ['إضافة سريعة', options[1][1].filter((item) => item.id.startsWith('quick-'))],
+      ['مقترحات الآن', [
+        { t: 'تقديم مذكرة التعقيب — الأفق', m: 'موعد نهائي اليوم 4:30 م', ic: 'clock', f: () => A.openTask({ dataset: { id: 't2' } }) },
+        { t: 'شركة نماء ضد مؤسسة الإعمار الحديث', m: 'مهلة الاعتراض تنتهي بعد يومين', ic: 'alert', f: () => go('case', 'c3') },
+        { t: 'جلسة المحكمة العمالية 11:30', m: 'محمد الغامدي ضد شركة البيان', ic: 'cal', f: () => openSession('s7') },
+      ]],
+    ];
+  } else groups = searchGroups(q, cmdScope, cmdCaseTab);
+  const total = groups.reduce((sum, group) => sum + group[1].length, 0);
+  const displayed = groups.map(([label, entries]) => {
+    const limit = !q && cmdScope === 'all' && !cmdCaseTab ? 7 : 6;
+    if (cmdExpanded.has(label) || entries.length <= limit) return [label, entries];
+    return [label, [...entries.slice(0, limit), {
+      t: 'عرض المزيد من ' + label + ' (' + (entries.length - limit) + ')',
+      m: 'إظهار بقية النتائج المطابقة', ic: 'chevD', stay: true,
+      f: () => { cmdExpanded.add(label); cmdSearch(q); },
+    }]];
+  });
+  cmdItems = displayed.flatMap((group) => group[1]);
+  cmdIdx = cmdItems.length ? 0 : -1;
+  let index = 0;
+  $('#cmdRes').innerHTML = cmdItems.length ? displayed.map(([label, entries]) =>
+    '<div role="group" aria-label="' + esc(label) + '"><div class="cmd-g" aria-hidden="true">' + label + '</div>' +
+    entries.map((item) => {
+      const current = index++;
+      return '<div class="cmd-i" id="cmd-result-' + current + '" role="option" aria-selected="false" data-ci="' + current + '">' +
+        '<div class="ic">' + ic(item.ic) + '</div><div class="grow"><div class="t">' + hl(item.t, q) + '</div>' +
+        (item.m ? '<div class="m">' + esc(item.m) + '</div>' : '') + '</div>' +
+        (item.k ? '<span class="kbd">' + esc(item.k) + '</span>' : '<span class="go">' + (item.stay ? 'المزيد' : 'فتح') + ic('chevL', 'width="12" height="12"') + '</span>') + '</div>';
+    }).join('') + '</div>').join('') :
+    '<div class="empty" style="padding:28px">' + emptyArt() + '<b>لا نتائج لـ «' + esc(q) + '»</b>' +
+    '<p>جرّب كلمة أقصر، مثل «سكرتير» أو «مصروف»، أو رقم القضية. ويمكنك توسيع البحث إلى الكل.</p></div>';
+  $('#cmdStatus').textContent = total ? total + ' نتيجة' : 'لا نتائج مطابقة';
+  $$('#cmdRes .cmd-i').forEach((el) => {
+    el.onmouseenter = () => { cmdIdx = +el.dataset.ci; cmdPaint(false); };
+    el.onmousedown = (e) => e.preventDefault();
+    el.onclick = () => cmdRun(+el.dataset.ci);
+  });
+  $('#cmdRes').scrollTop = 0;
+  cmdPaint(false);
+}
+function cmdPaint(scroll = true) {
+  $$('#cmdRes .cmd-i').forEach((el) => {
+    const selected = +el.dataset.ci === cmdIdx;
+    el.classList.toggle('act', selected);
+    el.setAttribute('aria-selected', String(selected));
+  });
+  const q = $('#cmdQ'), selected = $('#cmd-result-' + cmdIdx);
+  if (selected) q.setAttribute('aria-activedescendant', selected.id);
+  else q.removeAttribute('aria-activedescendant');
+  if (scroll) selected?.scrollIntoView({ block: 'nearest' });
+}
+function cmdRun(index) {
+  const item = cmdItems[index];
+  if (!item) return;
+  if (item.stay) { item.f(); return; }
+  closeCmd();
+  closeDrawer();
+  closeModal();
+  item.f();
+}
 
 /* ==========================================================
    QUICK ADD (FAB + forms)
